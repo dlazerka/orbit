@@ -1,0 +1,25 @@
+html, body {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+.stretch {
+	display: block;
+	position: absolute;
+	height: auto;
+	padding: 20px;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+}
+
+.pane {
+	position: relative;
+	height: 100%;
+}
+
+.celestial {
+	position: absolute;
+}

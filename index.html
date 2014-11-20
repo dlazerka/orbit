@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>Orbit</title>
+
+	<link href="index.css" rel="stylesheet" type="text/css">
+
+	<script type="text/javascript" src="jquery-2.1.1.js" defer></script>
+	<script type="text/javascript" src="angular.js" defer></script>
+
+	<script type="text/javascript" src="body.js" defer></script>
+
+	<script type="text/javascript" src="app.js" defer></script>
+	<script type="text/javascript" src="pane.js" defer></script>
+
+	<!--<script type="text/javascript" src="index.js" defer></script>-->
+
+</head>
+<body ng-app="me.lazerka.orbit" class="ng-cloak;">
+
+<div class="stretch" >
+	<div class="pane" ng-controller="PaneController" my-mousewheel="onzoom($event)">
+		<celestial name="kerbin" radius="{{600000 * zoom}}" mass="5.2915793e22" color="lightskyblue"></celestial>
+		<celestial name="mun" radius="{{200000 * zoom}}" mass="9.7600236e20" distance="{{12000000 / zoom}}" color="#48d1cc"></celestial>
+	</div>
+</div>
+
+</body>
+</html>
