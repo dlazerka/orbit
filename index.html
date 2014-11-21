@@ -20,10 +20,24 @@
 <body ng-app="me.lazerka.orbit" class="ng-cloak;">
 
 <div class="stretch" >
-	<div class="pane" ng-controller="PaneController" my-mousewheel="onzoom($event)">
-		<celestial name="kerbin" radius="{{600000 * zoom}}" mass="5.2915793e22" color="lightskyblue"></celestial>
-		<celestial name="mun" radius="{{200000 * zoom}}" mass="9.7600236e20" distance="{{12000000 / zoom}}" color="#48d1cc"></celestial>
+	<div class="pane" ng-controller="PaneController" my-mousewheel="onzoom($event)" >
+		<celestial
+				name="kerbin"
+				radius="{{600000 / zoom}}"
+				mass="5.2915793e22"
+				color="lightskyblue"
+		        ng-style="position(0)"
+				></celestial>
+		<celestial
+				name="mun"
+				radius="{{200000 / zoom}}"
+		        mass="9.7600236e20"
+		        ng-style="position(12000000)"
+		        color="#48d1cc"></celestial>
+
+		<div class="scale">1:{{zoom | number}}</div>
 	</div>
+
 </div>
 
 </body>

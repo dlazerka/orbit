@@ -18,8 +18,12 @@ html, body {
 .pane {
 	position: relative;
 	height: 100%;
+	overflow: hidden;
+	border: 1px gray solid;
+	border-radius: 5px;
 }
 
+celestial,
 .celestial {
 	position: absolute;
 }

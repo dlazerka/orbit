@@ -1,11 +1,24 @@
 angular.module('me.lazerka.orbit', [])
-	.controller('PaneController', function($scope) {
+	.controller('PaneController', function($scope, $element, $window) {
 
+		$scope.time = 0;
 
-		$scope.kerbin = new Body('kerbin', 0, 0, 600000, 5.2915793e22);
-		$scope.mun = new Body('mun', 12000000, 0, 200000, 9.7600236e20);
+		angular.element($window).bind('resize', {}, function() {
+			$scope.$apply();
+		});
 
-		$scope.bodies = [$scope.kerbin, $scope.mun];
+		$scope.position = function(radius) {
+			var x = Math.cos($scope.time) * radius / $scope.zoom;
+			var left = x + $element.width() / 2;
+
+			var y = Math.sin($scope.time) * radius / $scope.zoom;
+			var top = y + $element.height() / 2;
+
+			return {
+				left: left + 'px',
+				top: top + 'px'
+			};
+		};
 	})
 	.directive('celestial', function($parse) {
 		return {
@@ -13,39 +26,47 @@ angular.module('me.lazerka.orbit', [])
 			template:
 				'<svg xmlns="http://www.w3.org/2000/svg""' +
 				'       class="celestial" ' +
-				'       style="left: {{left()}}px; width: {{size() * 2}}px; height: {{size() * 2}}px;">' +
+				'       style="width: {{size() * 2}}px; height: {{size() * 2}}px;' +
+				'' +
+				'       ">' +
 				'   <circle ng-attr-cx="{{size()}}" ng-attr-cy="{{size()}}" stroke-width="1px"' +
 			    '       style="stroke: black; vector-effect: non-scaling-stroke; fill: {{color}};"' +
-			    '       ng-attr-r="{{size() - 1}}"/>' +
+			    '       ng-attr-r="{{size()}}"/>' +
 			    '</svg>',
 			scope: {
 				name: '@',
 				color: '@',
 				mass: '@',
-				radius: '@',
-				distance: '@'
+				radius: '@'
 			},
 			link: function($scope, $element, $attrs) {
 				// Didn't get how to make `scope: {color: '=color'}` to work.
 
 				$scope.size = function() {
-					return $scope.radius / 1000;
+					return Math.floor($scope.radius);
 				};
-
-				$scope.left = function() {
-					return $scope.distance / 100000 || 0;
-				}
 			}
 		};
 	})
-	.directive('myMousewheel', function() {
+	.directive('myMousewheel', function($parse) {
 		return {
 			restrict: 'A',
+			link: function(scope, element, attr) {
+				var expr = $parse(attr['myMousewheel']);
+
+				element.bind('wheel', function(event){
+					scope.$apply(function() {
+						expr(scope, {
+							$event: event
+						});
+					});
+				});
+			},
 			controller: function($scope){
-				const zoomTable = [
-						1/100, 1/75, 1/50, 1/40, 1/30, 1/20, 1/15, 1/10, 1/8, 1/5, 1/3, 1/2, 1/1.5, 1/1.25,
-					1, 1.1, 1.3];
-				$scope.zoom = zoomTable[8];
+				var zoomTable = [
+						1000, 750, 500, 400, 300, 200, 150, 100, 80, 50, 30, 20, 15, 12.5, 10, 8, 6];
+				zoomTable = zoomTable.map(function(a) {return a * 100});
+				$scope.zoom = zoomTable[5];
 
 				$scope.onzoom = function($event) {
 					if ($event.ctrlKey || $event.metaKey || $event.shiftKey) {
@@ -59,11 +80,37 @@ angular.module('me.lazerka.orbit', [])
 					zoomIndex = Math.max(zoomIndex, 0);
 					zoomIndex = Math.min(zoomIndex, zoomTable.length - 1);
 
-					$scope.zoom = zoomIndex;
+					$scope.zoom = zoomTable[zoomIndex];
 
 					console.log('zoomIndex=' + zoomIndex + ', zoom=' + $scope.zoom);
 				};
 			}
 		};
 	})
+	/*
+	.directive('resize', function ($window) {
+		return function (scope, element) {
+			var w = angular.element($window);
+			scope.getWindowDimensions = function () {
+				return { 'h': w.height(), 'w': w.width() };
+			};
+			scope.$watch(scope.getWindowDimensions, function (newValue, oldValue) {
+				scope.windowHeight = newValue.h;
+				scope.windowWidth = newValue.w;
+
+				scope.style = function () {
+					return {
+						'height': (newValue.h - 100) + 'px',
+						'width': (newValue.w - 100) + 'px'
+					};
+				};
+
+			}, true);
+
+			w.bind('resize', function () {
+				scope.$apply();
+			});
+		}
+	})
+	*/
 ;
