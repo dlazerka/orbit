@@ -23,7 +23,13 @@ html, body {
 	border-radius: 5px;
 }
 
-celestial,
-.celestial {
+celestial {
 	position: absolute;
+}
+
+.play, .pause {
+	font-size: 1em;
+	bottom: 10px;
+	position: absolute;
+	left: 49%;
 }

@@ -20,7 +20,7 @@
 <body ng-app="me.lazerka.orbit" class="ng-cloak;">
 
 <div class="stretch" >
-	<div class="pane" ng-controller="PaneController" my-mousewheel="onzoom($event)" >
+	<div class="pane" ng-controller="PaneController" on-mousewheel="onzoom($event)" >
 		<celestial
 				name="kerbin"
 				radius="{{600000 / zoom}}"
@@ -36,6 +36,9 @@
 		        color="#48d1cc"></celestial>
 
 		<div class="scale">1:{{zoom | number}}</div>
+
+		<button class="play" ng-click="play()" ng-show="!playing">Play</button>
+		<button class="pause" ng-click="pause()" ng-show="playing">Pause</button>
 	</div>
 
 </div>
