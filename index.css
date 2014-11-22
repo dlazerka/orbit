@@ -24,7 +24,7 @@ html, body {
 	border-radius: 5px;
 }
 
-celestial {
+celestial, .celestial {
 	position: absolute;
 	display: block;
 }
@@ -34,4 +34,9 @@ celestial {
 	bottom: 10px;
 	position: absolute;
 	left: 49%;
+}
+
+.scale {
+	position: absolute;
+	color: white;
 }
