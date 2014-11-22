@@ -75,9 +75,10 @@ angular.module('me.lazerka.orbit', [])
 				});
 			},
 			controller: function($scope){
-				var zoomTable = [
-						1000, 750, 500, 400, 300, 200, 150, 100, 80, 50, 30, 20, 15, 12.5, 10, 8, 6];
-				zoomTable = zoomTable.map(function(a) {return a * 100});
+				var zoomTable = [1000, 750, 500, 400, 300, 200, 150, 100, 80, 50, 30, 20, 15, 12.5, 10, 8, 6]
+					.map(function(a) {
+						return a * 100;
+					});
 				$scope.zoom = zoomTable[5];
 
 				$scope.onzoom = function($event) {
