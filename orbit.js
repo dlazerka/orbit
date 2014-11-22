@@ -1,26 +1,29 @@
+// $(foo) is done for jsFiddle, it has problems loading jQuery right.
 angular.module('me.lazerka.orbit', [])
-	.controller('PaneController', function($scope, $element, $window, $interval) {
+	.controller('PaneController', ['$scope', '$element', '$window', '$interval',
+	function($scope, $element, $window, $interval) {
+		$window = $($window);
+		$element = $($element);
 
 		$scope.time = 0;
 		$scope.playing = null;
 
-		angular.element($window).bind('resize', {}, function() {
+		$window.bind('resize', function() {
 			$scope.$apply();
 		});
 
-		$scope.position = function(radius) {
-			var x = Math.cos($scope.time) * radius / $scope.zoom;
-			var left = x + $element.width() / 2;
+		$scope.position = function(orbit, radius) {
+			var x = Math.cos($scope.time) * orbit / $scope.zoom;
+			var left = x + $element.width() / 2 - radius;
 
-			var y = -Math.sin($scope.time) * radius / $scope.zoom;
-			var top = y + $element.height() / 2;
+			var y = -Math.sin($scope.time) * orbit / $scope.zoom;
+			var top = y + $element.height() / 2 - radius;
 
 			return {
 				left: Math.round(left) + 'px',
 				top: Math.round(top) + 'px'
 			};
 		};
-
 
 		$scope.play = function() {
 			if ($scope.playing) {
@@ -35,9 +38,9 @@ angular.module('me.lazerka.orbit', [])
 		$scope.pause = function() {
 			$interval.cancel($scope.playing);
 			$scope.playing = null;
-		}
-	})
-	.directive('celestial', function($parse) {
+		};
+	}])
+	.directive('celestial', [function() {
 		return {
 			restrict: 'E',
 			template:
@@ -59,8 +62,8 @@ angular.module('me.lazerka.orbit', [])
 				scope.radius = Number(scope.radius);
 			}
 		};
-	})
-	.directive('onMousewheel', function($parse) {
+	}])
+	.directive('onMousewheel', ['$parse', function($parse) {
 		return {
 			restrict: 'A',
 			link: function(scope, element, attr) {
@@ -74,7 +77,7 @@ angular.module('me.lazerka.orbit', [])
 					});
 				});
 			},
-			controller: function($scope){
+			controller: ['$scope', function($scope){
 				var zoomTable = [1000, 750, 500, 400, 300, 200, 150, 100, 80, 50, 30, 20, 15, 12.5, 10, 8, 6]
 					.map(function(a) {
 						return a * 100;
@@ -82,20 +85,21 @@ angular.module('me.lazerka.orbit', [])
 				$scope.zoom = zoomTable[5];
 
 				$scope.onzoom = function($event) {
-					if ($event.ctrlKey || $event.metaKey || $event.shiftKey) {
+					var event = $event.originalEvent || $event; // jsFiddle puts original event into $event already.
+					if (event.ctrlKey || event.metaKey || event.shiftKey) {
 						return;
 					}
-					$event.preventDefault();
+					event.preventDefault();
 
 					var zoomIndex = zoomTable.indexOf($scope.zoom);
 
-					zoomIndex += $event.originalEvent.wheelDelta / Math.abs($event.originalEvent.wheelDelta);
+					zoomIndex += event.wheelDelta / Math.abs(event.wheelDelta);
 					zoomIndex = Math.max(zoomIndex, 0);
 					zoomIndex = Math.min(zoomIndex, zoomTable.length - 1);
 
 					$scope.zoom = zoomTable[zoomIndex];
 				};
-			}
+			}]
 		};
-	})
+	}])
 ;

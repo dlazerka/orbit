@@ -20,13 +20,13 @@
 				radius="{{600000 / zoom}}"
 				mass="5.2915793e22"
 				color="lightskyblue"
-		        ng-style="position(0)"
+		        ng-style="position(0, 600000 / zoom)"
 				></celestial>
 		<celestial
 				name="mun"
 				radius="{{200000 / zoom}}"
 		        mass="9.7600236e20"
-		        ng-style="position(12000000)"
+		        ng-style="position(12000000, 200000 / zoom)"
 		        color="#48d1cc"></celestial>
 
 		<div class="scale">1:{{zoom | number}}</div>
