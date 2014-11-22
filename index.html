@@ -8,13 +8,14 @@
 
 	<script type="text/javascript" src="jquery-2.1.1.js" defer></script>
 	<script type="text/javascript" src="angular-1.3.2.js" defer></script>
+	<script type="text/javascript" src="three.r67.js" defer></script>
 
 	<script type="text/javascript" src="orbit.js" defer></script>
 </head>
 <body ng-app="me.lazerka.orbit" class="ng-cloak">
 
 <div class="stretch" >
-	<div class="pane" ng-controller="PaneController" on-mousewheel="onzoom($event)" >
+	<pane class="pane" on-mousewheel="onzoom($event)" >
 		<celestial
 				name="kerbin"
 				radius="{{600000 / zoom}}"
@@ -33,8 +34,7 @@
 
 		<button class="play" ng-click="play()" ng-show="!playing">Play</button>
 		<button class="pause" ng-click="pause()" ng-show="playing">Pause</button>
-	</div>
-
+	</pane>
 </div>
 </body>
 </html>

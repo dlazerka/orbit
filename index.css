@@ -16,6 +16,7 @@ html, body {
 }
 
 .pane {
+	display: block;
 	position: relative;
 	height: 100%;
 	overflow: hidden;
@@ -25,6 +26,7 @@ html, body {
 
 celestial {
 	position: absolute;
+	display: block;
 }
 
 .play, .pause {
