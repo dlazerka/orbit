@@ -1,3 +1,4 @@
+"use strict";
 // $(foo) is done for jsFiddle, it has problems loading jQuery right.
 angular.module('me.lazerka.orbit', [])
 	.directive('pane', function($window) {
@@ -67,35 +68,34 @@ angular.module('me.lazerka.orbit', [])
 			replace: true,
 			template: function() {
 				return '<svg xmlns="http://www.w3.org/2000/svg" class="celestial"' +
-				'       ng-attr-width="{{radius * 2}}" ng-attr-height="{{radius * 2}}">' +
-				'   <circle ng-attr-cx="{{radius}}" ng-attr-cy="{{radius}}"' +
+				'       ng-attr-width="{{scaledRadius * 2}}" ng-attr-height="{{scaledRadius * 2}}">' +
+				'   <circle ng-attr-cx="{{scaledRadius}}" ng-attr-cy="{{scaledRadius}}"' +
 				'       stroke-width="1px"' +
 			    '       style="stroke: black; vector-effect: non-scaling-stroke; fill: {{color}};"' +
-			    '       ng-attr-r="{{radius - 1}}"/>' +
+			    '       ng-attr-r="{{scaledRadius - 1}}"/>' +
 			    '</svg>'},
 			scope: {
 				name: '@',
 				zoom: '&',
 				color: '@',
-				mass: '@',
-				radius: '@',
 				left: '@',
 				top: '@'
 			},
 			link: function(scope, element, attrs, pane) {
-				scope.mass = Number(scope.mass);
-				scope.radius = Number(scope.radius);
+				var mass = Number(attrs.mass);
+				var radius = Number(attrs.radius);
+				scope.scaledRadius = 1;
 
 				function getZoomAndPosition(scope2) {
 					return scope2.zoom() + '_' + scope.top + '_' + scope.left;
 				}
 
 				scope.$watch(getZoomAndPosition, function(value) {
-					scope.radius = attrs.radius / scope.zoom();
+					scope.scaledRadius = radius / scope.zoom();
 
 					element.css({
-						'top': Math.floor(scope.top - scope.radius) + 'px',
-						'left': Math.floor(scope.left - scope.radius) + 'px'
+						'top': Math.floor(scope.top - scope.scaledRadius) + 'px',
+						'left': Math.floor(scope.left - scope.scaledRadius) + 'px'
 					});
 				});
 			}
