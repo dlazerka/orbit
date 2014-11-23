@@ -4,36 +4,34 @@ angular.module('me.lazerka.orbit', [])
 		return {
 			restrict: 'E',
 			link : function(scope, element, attrs) {
-
-				var renderer = new THREE.WebGLRenderer();
+				var renderer = scope.three.renderer;
 				renderer.setSize(element.innerWidth(), element.innerHeight());
-				element.append(renderer.domElement);
 
 				$($window).bind('resize', function() {
 					renderer.setSize(element.innerWidth(), element.innerHeight());
 				});
 
-				scope.three = {
-					scene: new THREE.Scene(),
-					camera: new THREE.PerspectiveCamera(75, element.innerWidth() / element.innerHeight(), 0.1, 1000),
-					renderer: renderer
-				};
+				element.append(renderer.domElement);
 			},
 			controller: function($scope, $element, $interval) {
 				$scope.time = 0;
 				$scope.playing = null;
 
+
 				$($window).bind('resize', function() {
-					$scope.$apply();
+					// May be already digesting if hit a breakpoint in console.
+					if (!$scope.$$phase) {
+						$scope.$digest();
+					}
 				});
 
 				$scope.left = function(orbit) {
-					var x = Math.cos($scope.time) * orbit / $scope.zoom;
+					var x = Math.cos($scope.time / 64) * orbit / $scope.zoom;
 					var left = x + $element.innerWidth() / 2;
 					return left;
 				};
 				$scope.top = function(orbit) {
-					var y = -Math.sin($scope.time) * orbit / $scope.zoom;
+					var y = -Math.sin($scope.time / 64) * orbit / $scope.zoom;
 					var top = y + $element.innerHeight() / 2;
 					return top;
 				};
@@ -44,7 +42,7 @@ angular.module('me.lazerka.orbit', [])
 					}
 					// Very inefficient.
 					$scope.playing = $interval(function() {
-						$scope.time += 1 / 256;
+						$scope.time += 1 / 4;
 					}, 4);
 				};
 
@@ -53,9 +51,12 @@ angular.module('me.lazerka.orbit', [])
 					$scope.playing = null;
 				};
 
-				$scope.zoom2 = function() {
-					console.log(arguments);
-				}
+				$scope.three = {
+					scene: new THREE.Scene(),
+					camera: new THREE.PerspectiveCamera(75, $element.innerWidth() / $element.innerHeight(), 0.1, 1000),
+					renderer: new THREE.WebGLRenderer()
+				};
+
 			}
 		};
 	})
@@ -74,7 +75,7 @@ angular.module('me.lazerka.orbit', [])
 			    '</svg>'},
 			scope: {
 				name: '@',
-				zoom: '@',
+				zoom: '&',
 				color: '@',
 				mass: '@',
 				radius: '@',
@@ -85,16 +86,17 @@ angular.module('me.lazerka.orbit', [])
 				scope.mass = Number(scope.mass);
 				scope.radius = Number(scope.radius);
 
-				scope.$watch('zoom', function(value) {
-					scope.radius = attrs.radius / value;
-					element.css('top', Math.floor(scope.top - scope.radius) + 'px');
-					element.css('left', Math.floor(scope.left - scope.radius) + 'px');
-				});
-				scope.$watch('top', function(value) {
-					element.css('top', Math.floor(value - scope.radius) + 'px');
-				});
-				scope.$watch('left', function(value) {
-					element.css('left', Math.floor(value - scope.radius) + 'px');
+				function getZoomAndPosition(scope2) {
+					return scope2.zoom() + '_' + scope.top + '_' + scope.left;
+				}
+
+				scope.$watch(getZoomAndPosition, function(value) {
+					scope.radius = attrs.radius / scope.zoom();
+
+					element.css({
+						'top': Math.floor(scope.top - scope.radius) + 'px',
+						'left': Math.floor(scope.left - scope.radius) + 'px'
+					});
 				});
 			}
 		};

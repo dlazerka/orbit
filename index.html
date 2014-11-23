@@ -18,7 +18,7 @@
 	<pane class="pane" on-mousewheel="onzoom($event)" >
 		<celestial
 				name="kerbin"
-				zoom="{{zoom}}"
+				zoom="zoom"
 				radius="600000"
 				mass="5.2915793e22"
 				top="{{top(0)}}"
@@ -28,11 +28,12 @@
 		<celestial
 				name="mun"
 				radius="200000"
-				zoom="{{zoom}}"
+				zoom="zoom"
 		        mass="9.7600236e20"
 		        top="{{top(12000000)}}"
 		        left="{{left(12000000)}}"
-		        color="#48d1cc"></celestial>
+		        color="#48d1cc"
+				></celestial>
 
 		<div class="scale">1:{{zoom | number}}</div>
 
