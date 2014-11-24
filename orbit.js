@@ -2,16 +2,26 @@
 // $(foo) is done for jsFiddle, it has problems loading jQuery right.
 angular.module('me.lazerka.orbit', [])
 	.directive('pane', function($window) {
-		var renderer = new THREE.WebGLRenderer();
+		var renderer = new THREE.WebGLRenderer({alpha: true});
 		var scene = new THREE.Scene();
+		var camera = new THREE.PerspectiveCamera(
+			30, // fov
+			1, // aspect
+			10, // near
+			100000000 // far
+		);
 
 		return {
 			restrict: 'E',
 			link : function(scope, element, attrs) {
 				renderer.setSize(element.innerWidth(), element.innerHeight());
+				camera.aspect = element.innerWidth() / element.innerHeight();
+				camera.updateProjectionMatrix();
 
 				$($window).bind('resize', function() {
 					renderer.setSize(element.innerWidth(), element.innerHeight());
+					camera.aspect = element.innerWidth() / element.innerHeight();
+					camera.updateProjectionMatrix();
 				});
 
 				element.append(renderer.domElement);
@@ -19,26 +29,6 @@ angular.module('me.lazerka.orbit', [])
 			controller: function($scope, $element, $interval) {
 				$scope.playing = null;
 				$scope.warp = 1;
-
-				$($window).bind('resize', function() {
-					// May be already digesting if hit a breakpoint in console.
-					if (!$scope.$$phase) {
-						$scope.$digest();
-					}
-				});
-
-				$scope.position = function(orbit) {
-					var x = Math.cos($scope.time / 64) * orbit / $scope.zoom;
-					var left = x + $element.innerWidth() / 2;
-
-					var y = -Math.sin($scope.time / 64) * orbit / $scope.zoom;
-					var top = y + $element.innerHeight() / 2;
-
-					return {
-						left: left,
-						top: top
-					};
-				};
 
 				$scope.play = function() {
 					$scope.playing = true;
@@ -52,8 +42,6 @@ angular.module('me.lazerka.orbit', [])
 
 				//var camera = new THREE.OrthographicCamera(
 				//	-100, 100, -100, 100, 10, 100000);
-				var camera = new THREE.PerspectiveCamera(
-					30, $element.innerWidth() / $element.innerHeight(), 10, 100000000);
 
 				var celestials = [];
 				var lastTime = 0;
