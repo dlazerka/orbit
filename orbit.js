@@ -2,10 +2,12 @@
 // $(foo) is done for jsFiddle, it has problems loading jQuery right.
 angular.module('me.lazerka.orbit', [])
 	.directive('pane', function($window) {
+		var renderer = new THREE.WebGLRenderer();
+		var scene = new THREE.Scene();
+
 		return {
 			restrict: 'E',
 			link : function(scope, element, attrs) {
-				var renderer = scope.three.renderer;
 				renderer.setSize(element.innerWidth(), element.innerHeight());
 
 				$($window).bind('resize', function() {
@@ -15,9 +17,8 @@ angular.module('me.lazerka.orbit', [])
 				element.append(renderer.domElement);
 			},
 			controller: function($scope, $element, $interval) {
-				$scope.time = 0;
 				$scope.playing = null;
-
+				$scope.warp = 1;
 
 				$($window).bind('resize', function() {
 					// May be already digesting if hit a breakpoint in console.
@@ -26,38 +27,81 @@ angular.module('me.lazerka.orbit', [])
 					}
 				});
 
-				$scope.left = function(orbit) {
+				$scope.position = function(orbit) {
 					var x = Math.cos($scope.time / 64) * orbit / $scope.zoom;
 					var left = x + $element.innerWidth() / 2;
-					return left;
-				};
-				$scope.top = function(orbit) {
+
 					var y = -Math.sin($scope.time / 64) * orbit / $scope.zoom;
 					var top = y + $element.innerHeight() / 2;
-					return top;
+
+					return {
+						left: left,
+						top: top
+					};
 				};
 
 				$scope.play = function() {
-					if ($scope.playing) {
-						return;
-					}
-					// Very inefficient.
-					$scope.playing = $interval(function() {
-						$scope.time += 1 / 4;
-					}, 4);
+					$scope.playing = true;
+					renderLoop(0);
 				};
 
 				$scope.pause = function() {
-					$interval.cancel($scope.playing);
-					$scope.playing = null;
+					//$interval.cancel($scope.playing);
+					$scope.playing = false;
 				};
 
+				//var camera = new THREE.OrthographicCamera(
+				//	-100, 100, -100, 100, 10, 100000);
+				var camera = new THREE.PerspectiveCamera(
+					30, $element.innerWidth() / $element.innerHeight(), 10, 100000000);
+
+				var celestials = [];
+				var lastTime = 0;
+				function renderLoop(time) {
+					if (!$scope.playing) {
+						return;
+					}
+					var dt = (time - lastTime) / 1000;
+					lastTime = time;
+
+					renderer.render(scene, camera);
+					$window.requestAnimationFrame(renderLoop);
+
+					for (var i = 0; i < celestials.length; i++) {
+						var celestial = celestials[i];
+
+						celestial.mesh.rotateY(dt * Math.PI / 10);
+						for (var j = 0; j < celestials.length; j++) {
+							if (j == i) continue;
+							//celestial.velocity =
+						}
+					}
+				}
+
+				this.addCelestial = function(mesh, position, velocity, mass) {
+					mesh.position.add(position);
+					mesh.rotateX(Math.PI/2);
+					mesh.updateMatrix();
+
+					celestials.push({
+						mesh: mesh,
+						position: position,
+						velocity: velocity,
+						mass: mass
+					});
+
+					scene.add(mesh);
+				};
+
+				$scope.setZoom = function(zoom) {
+					camera.position.z = zoom;
+				};
 				$scope.three = {
-					scene: new THREE.Scene(),
-					camera: new THREE.PerspectiveCamera(75, $element.innerWidth() / $element.innerHeight(), 0.1, 1000),
-					renderer: new THREE.WebGLRenderer()
+					scene: scene,
+					camera: camera,
+					renderer: renderer
 				};
-
+				$scope.play();
 			}
 		};
 	})
@@ -66,77 +110,64 @@ angular.module('me.lazerka.orbit', [])
 			restrict: 'E',
 			require: '^pane',
 			replace: true,
-			template: function() {
-				return '<svg xmlns="http://www.w3.org/2000/svg" class="celestial"' +
-				'       ng-attr-width="{{scaledRadius * 2}}" ng-attr-height="{{scaledRadius * 2}}">' +
-				'   <circle ng-attr-cx="{{scaledRadius}}" ng-attr-cy="{{scaledRadius}}"' +
-				'       stroke-width="1px"' +
-			    '       style="stroke: black; vector-effect: non-scaling-stroke; fill: {{color}};"' +
-			    '       ng-attr-r="{{scaledRadius - 1}}"/>' +
-			    '</svg>'},
 			scope: {
 				name: '@',
-				zoom: '&',
 				color: '@',
-				left: '@',
-				top: '@'
+				equator: '@',
+				orbit: '@',
+				mass: '@'
 			},
 			link: function(scope, element, attrs, pane) {
-				var mass = Number(attrs.mass);
-				var radius = Number(attrs.radius);
-				scope.scaledRadius = 1;
+				var mass = Number(scope.mass);
+				var radius = scope.equator / 2 / Math.PI;
+				var orbit = parseInt(scope.orbit);
 
-				function getZoomAndPosition(scope2) {
-					return scope2.zoom() + '_' + scope.top + '_' + scope.left;
-				}
-
-				scope.$watch(getZoomAndPosition, function(value) {
-					scope.scaledRadius = radius / scope.zoom();
-
-					element.css({
-						'top': Math.floor(scope.top - scope.scaledRadius) + 'px',
-						'left': Math.floor(scope.left - scope.scaledRadius) + 'px'
-					});
+				var geometry = new THREE.SphereGeometry(radius, 32, 32);
+				var material = new THREE.MeshBasicMaterial({
+					color: parseInt(scope.color, 16),
+					wireframe: true
 				});
+				var mesh = new THREE.Mesh(geometry, material);
+
+				var position = {x: orbit, y: 0, z: 0};
+				var velocity = {x: 0, y: 0, z: orbit ? -542.5: 0};
+				pane.addCelestial(mesh, position, velocity, mass);
 			}
 		};
 	})
 	.directive('onMousewheel', function($parse) {
+		var zoomTable = [1000, 750, 500, 400, 300, 200, 150, 100, 80, 50, 30, 20, 15, 12.5, 10, 8, 6]
+			.map(function(a) {
+				return a * 100000;
+			});
 		return {
 			restrict: 'A',
 			link: function(scope, element, attr) {
+				var zoom = zoomTable[8];
 				var expr = $parse(attr['onMousewheel']);
 
-				element.bind('wheel', function(event){
-					scope.$apply(function() {
-						expr(scope, {
-							$event: event
-						});
-					});
-				});
-			},
-			controller: function($scope){
-				var zoomTable = [1000, 750, 500, 400, 300, 200, 150, 100, 80, 50, 30, 20, 15, 12.5, 10, 8, 6]
-					.map(function(a) {
-						return a * 100;
-					});
-				$scope.zoom = zoomTable[5];
+				// Set initial zoom;
+				expr(scope)(zoom);
 
-				$scope.onzoom = function($event) {
-					var event = $event.originalEvent || $event; // jsFiddle puts original event into $event already.
+				element.bind('wheel', function(event){
+					event = event.originalEvent || event; // jsFiddle puts original event into $event already.
 					if (event.ctrlKey || event.metaKey || event.shiftKey) {
 						return;
 					}
 					event.preventDefault();
 
-					var zoomIndex = zoomTable.indexOf($scope.zoom);
+					var zoomIndex = zoomTable.indexOf(zoom);
 
 					zoomIndex += event.wheelDelta / Math.abs(event.wheelDelta);
 					zoomIndex = Math.max(zoomIndex, 0);
 					zoomIndex = Math.min(zoomIndex, zoomTable.length - 1);
 
-					$scope.zoom = zoomTable[zoomIndex];
-				};
+					zoom = zoomTable[zoomIndex];
+
+					scope.$apply(function() {
+						expr(scope)(zoom);
+					});
+				});
 			}
 		};
 	})

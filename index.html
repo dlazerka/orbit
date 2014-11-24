@@ -15,27 +15,26 @@
 <body ng-app="me.lazerka.orbit" class="ng-cloak">
 
 <div class="stretch" >
-	<pane class="pane" on-mousewheel="onzoom($event)" >
+	<pane class="pane" on-mousewheel="setZoom" >
 		<celestial
 				name="kerbin"
-				zoom="zoom"
-				radius="600000"
+				equator="600000"
 				mass="5.2915793e22"
-				top="{{top(0)}}"
-				left="{{left(0)}}"
-				color="lightskyblue"
+				orbit="0"
+				color="87cefa"
 				></celestial>
 		<celestial
 				name="mun"
-				radius="200000"
-				zoom="zoom"
+				equator="200000"
+				orbit="1200000"
 		        mass="9.7600236e20"
-		        top="{{top(12000000)}}"
-		        left="{{left(12000000)}}"
-		        color="#48d1cc"
+		        color="48d1cc"
 				></celestial>
 
-		<div class="scale">1:{{zoom | number}}</div>
+		<div class="info">
+			<div class="scale">z={{three.camera.position.z | number}}</div>
+			<div class="warp">x{{warp | number}}</div>
+		</div>
 
 		<button class="play" ng-click="play()" ng-show="!playing">Play</button>
 		<button class="pause" ng-click="pause()" ng-show="playing">Pause</button>

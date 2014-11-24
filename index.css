@@ -3,6 +3,9 @@ html, body {
 	margin: 0;
 	padding: 0;
 }
+button {
+	user-select: none;
+}
 
 .stretch {
 	display: block;
@@ -36,7 +39,7 @@ celestial, .celestial {
 	left: 49%;
 }
 
-.scale {
+.info {
 	position: absolute;
 	color: white;
 }
