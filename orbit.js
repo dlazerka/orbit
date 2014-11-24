@@ -135,19 +135,21 @@ angular.module('me.lazerka.orbit', [])
 			}
 		};
 	})
-	.directive('onMousewheel', function($parse) {
+	.directive('onZoom', function() {
 		var zoomTable = [1000, 750, 500, 400, 300, 200, 150, 100, 80, 50, 30, 20, 15, 12.5, 10, 8, 6]
 			.map(function(a) {
 				return a * 100000;
 			});
 		return {
 			restrict: 'A',
+			scope: {
+				'onZoom': '&'
+			},
 			link: function(scope, element, attr) {
 				var zoom = zoomTable[8];
-				var expr = $parse(attr['onMousewheel']);
 
 				// Set initial zoom;
-				expr(scope)(zoom);
+				scope.onZoom()(zoom);
 
 				element.bind('wheel', function(event){
 					event = event.originalEvent || event; // jsFiddle puts original event into $event already.
@@ -165,7 +167,7 @@ angular.module('me.lazerka.orbit', [])
 					zoom = zoomTable[zoomIndex];
 
 					scope.$apply(function() {
-						expr(scope)(zoom);
+						scope.onZoom()(zoom);
 					});
 				});
 			}
