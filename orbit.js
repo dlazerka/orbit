@@ -11,6 +11,29 @@ angular.module('me.lazerka.orbit', [])
 			100000000 // far
 		);
 
+		var lastTime = 0;
+		var celestials = [];
+
+		function render() {
+			renderer.render(scene, camera);
+		}
+		function updateTime(time) {
+			var dt = (time - lastTime) / 1000;
+			lastTime = time;
+
+			for (var i = 0; i < celestials.length; i++) {
+				var celestial = celestials[i];
+
+				celestial.mesh.rotateY(dt * Math.PI / 10);
+				/*
+				 for (var j = 0; j < celestials.length; j++) {
+				 if (j == i) continue;
+				 //celestial.velocity =
+				 }
+				 */
+			}
+		}
+
 		return {
 			restrict: 'E',
 			link : function(scope, element, attrs) {
@@ -18,15 +41,17 @@ angular.module('me.lazerka.orbit', [])
 				camera.aspect = element.innerWidth() / element.innerHeight();
 				camera.updateProjectionMatrix();
 
-				$($window).bind('resize', function() {
+				$($window).on('resize', function() {
 					renderer.setSize(element.innerWidth(), element.innerHeight());
 					camera.aspect = element.innerWidth() / element.innerHeight();
 					camera.updateProjectionMatrix();
 				});
 
-				element.append(renderer.domElement);
+				element.prepend(renderer.domElement);
+
+				render(0);
 			},
-			controller: function($scope, $element, $interval) {
+			controller: function($scope) {
 				$scope.playing = null;
 				$scope.warp = 1;
 
@@ -34,37 +59,32 @@ angular.module('me.lazerka.orbit', [])
 					$scope.playing = true;
 					renderLoop(0);
 				};
+				function renderLoop(time) {
+					updateTime(time);
+					render();
+
+					if (!$scope.playing) {
+						return;
+					}
+					$window.requestAnimationFrame(renderLoop);
+				}
 
 				$scope.pause = function() {
 					//$interval.cancel($scope.playing);
 					$scope.playing = false;
 				};
 
-				//var camera = new THREE.OrthographicCamera(
-				//	-100, 100, -100, 100, 10, 100000);
+				this.rotateCameraBy = function(dx, dy) {
+					var pos = camera.position;
+					pos.x -= dx*10000;
+					pos.y += dy*10000;
 
-				var celestials = [];
-				var lastTime = 0;
-				function renderLoop(time) {
-					if (!$scope.playing) {
-						return;
-					}
-					var dt = (time - lastTime) / 1000;
-					lastTime = time;
+					console.log('camera new position: ' + pos.x + '\t' + pos.y + '\t' + pos.x);
 
-					renderer.render(scene, camera);
-					$window.requestAnimationFrame(renderLoop);
-
-					for (var i = 0; i < celestials.length; i++) {
-						var celestial = celestials[i];
-
-						celestial.mesh.rotateY(dt * Math.PI / 10);
-						for (var j = 0; j < celestials.length; j++) {
-							if (j == i) continue;
-							//celestial.velocity =
-						}
-					}
-				}
+					//camera.up = new THREE.Vector3(0,1,0);
+					camera.lookAt(new THREE.Vector3(0,0,0));
+					render();
+				};
 
 				this.addCelestial = function(mesh, position, velocity, mass) {
 					mesh.position.add(position);
@@ -79,17 +99,18 @@ angular.module('me.lazerka.orbit', [])
 					});
 
 					scene.add(mesh);
+					render();
 				};
 
-				$scope.setZoom = function(zoom) {
+				this.setZoom = function(zoom) {
 					camera.position.z = zoom;
+					render();
 				};
 				$scope.three = {
 					scene: scene,
 					camera: camera,
 					renderer: renderer
 				};
-				$scope.play();
 			}
 		};
 	})
@@ -97,7 +118,6 @@ angular.module('me.lazerka.orbit', [])
 		return {
 			restrict: 'E',
 			require: '^pane',
-			replace: true,
 			scope: {
 				name: '@',
 				color: '@',

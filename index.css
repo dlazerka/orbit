@@ -28,8 +28,8 @@ button {
 }
 
 celestial, .celestial {
+	display: none;
 	position: absolute;
-	display: block;
 }
 
 .play, .pause {
@@ -41,5 +41,6 @@ celestial, .celestial {
 
 .info {
 	position: absolute;
-	color: white;
+	top: 10px;
+	left: 10px;
 }
