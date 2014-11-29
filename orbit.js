@@ -14,6 +14,9 @@ angular.module('me.lazerka.orbit', [])
 		var lastTime = 0;
 		var celestials = [];
 
+		var stats = new Stats();
+		stats.setMode(1);
+
 		function render() {
 			renderer.render(scene, camera);
 		}
@@ -45,15 +48,21 @@ angular.module('me.lazerka.orbit', [])
 					renderer.setSize(element.innerWidth(), element.innerHeight());
 					camera.aspect = element.innerWidth() / element.innerHeight();
 					camera.updateProjectionMatrix();
+					render();
 				});
 
 				element.prepend(renderer.domElement);
+
+				$('.stats', element).append(stats.domElement);
 
 				render(0);
 			},
 			controller: function($scope) {
 				$scope.playing = null;
 				$scope.warp = 1;
+				// Distance between camera and target point.
+				$scope.distance = 1;
+				camera.position.z = 1;
 
 				$scope.play = function() {
 					$scope.playing = true;
@@ -74,16 +83,30 @@ angular.module('me.lazerka.orbit', [])
 					$scope.playing = false;
 				};
 
+
+				// Orbital controls: roll is always zero. I.e. camera.up==(0,1,0);
 				this.rotateCameraBy = function(dx, dy) {
-					var pos = camera.position;
-					pos.x -= dx*10000;
-					pos.y += dy*10000;
+					stats.begin();
+					var up = new THREE.Vector3();
+					up.copy(camera.up);
 
-					console.log('camera new position: ' + pos.x + '\t' + pos.y + '\t' + pos.x);
+					var axis = new THREE.Vector3();
+					axis.copy(up).setLength(dx);
+					axis.add(up.cross(camera.position).setLength(dy));
+					// z not needed as we keep roll zero.
+					axis.normalize();
 
-					//camera.up = new THREE.Vector3(0,1,0);
+					var angle = Math.sqrt(dx*dx+dy*dy) / 300;
+
+					var quaternion = new THREE.Quaternion();
+					quaternion.setFromAxisAngle(axis, -angle);
+					camera.position.applyQuaternion(quaternion);
+
+					console.log(camera.up);
+
 					camera.lookAt(new THREE.Vector3(0,0,0));
 					render();
+					stats.end();
 				};
 
 				this.addCelestial = function(mesh, position, velocity, mass) {
@@ -102,14 +125,10 @@ angular.module('me.lazerka.orbit', [])
 					render();
 				};
 
-				this.setZoom = function(zoom) {
-					camera.position.z = zoom;
+				this.setDistance = function(newDistance) {
+					$scope.distance = newDistance;
+					camera.position.setLength(newDistance);
 					render();
-				};
-				$scope.three = {
-					scene: scene,
-					camera: camera,
-					renderer: renderer
 				};
 			}
 		};
