@@ -172,7 +172,8 @@ angular.module('me.lazerka.orbit', [])
 				var orbit = parseInt(scope.orbit);
 
 				var geometry = new THREE.SphereGeometry(radius, 32, 32);
-				var texture = THREE.ImageUtils.loadTexture('img/kerbin.jpg');
+				var texture = THREE.ImageUtils.loadTexture('img/kerbin.jpg', null, onTextureLoaded);
+
 				var material = new THREE.MeshBasicMaterial({
 					color: parseInt(scope.color, 16),
 					map: texture
@@ -182,7 +183,10 @@ angular.module('me.lazerka.orbit', [])
 
 				var position = {x: orbit, y: 0, z: 0};
 				var velocity = {x: 0, y: 0, z: orbit ? -542.5: 0};
-				pane.addCelestial(mesh, position, velocity, mass);
+
+				function onTextureLoaded() {
+					pane.addCelestial(mesh, position, velocity, mass);
+				}
 			}
 		};
 	})

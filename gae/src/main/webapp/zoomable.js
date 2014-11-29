@@ -9,7 +9,7 @@ angular.module('me.lazerka.orbit')
 			restrict: 'A',
 			require: '^pane',
 			link: function(scope, element, attrs, pane) {
-				var distance = distances[8];
+				var distance = distances[6];
 
 				// Set initial distance;
 				pane.setDistance(distance);
