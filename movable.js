@@ -23,7 +23,7 @@ angular.module('me.lazerka.orbit')
 					dragging.which = null;
 					dragging.x = null;
 					dragging.y = null;
-					console.log('stop drag ' + event.target.nodeName + ' ' + event.eventPhase);
+					//console.log('stop drag ' + event.target.nodeName + ' ' + event.eventPhase);
 				}
 
 				element.on('contextmenu', function(event) {
@@ -35,7 +35,7 @@ angular.module('me.lazerka.orbit')
 					if (!shouldHandle(event)) return;
 					event.preventDefault();
 
-					console.log('start drag ' + event.target.nodeName + ' ' + event.eventPhase);
+					//console.log('start drag ' + event.target.nodeName + ' ' + event.eventPhase);
 
 					dragging.which = event.which;
 					dragging.x = event.offsetX;

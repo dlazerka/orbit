@@ -69,12 +69,14 @@ angular.module('me.lazerka.orbit', [])
 					renderLoop(0);
 				};
 				function renderLoop(time) {
+					stats.begin();
 					updateTime(time);
 					render();
 
 					if (!$scope.playing) {
 						return;
 					}
+					stats.end();
 					$window.requestAnimationFrame(renderLoop);
 				}
 
@@ -84,25 +86,45 @@ angular.module('me.lazerka.orbit', [])
 				};
 
 
-				// Orbital controls: roll is always zero. I.e. camera.up==(0,1,0);
+				/**
+				 * Orbital controls: roll is always zero. I.e. camera.up==(0,1,0);
+				 */
 				this.rotateCameraBy = function(dx, dy) {
 					stats.begin();
+
+					var mouse = new THREE.Vector2(dx, dy);
+					var angle = mouse.length() / 300;
+					mouse.normalize();
+
+					// Always (0, 1, 0) actually, but code below doesn't depend on it.
 					var up = new THREE.Vector3();
 					up.copy(camera.up);
 
+					var eye = new THREE.Vector3();
+					eye.copy(camera.position);
+
 					var axis = new THREE.Vector3();
-					axis.copy(up).setLength(dx);
-					axis.add(up.cross(camera.position).setLength(dy));
-					// z not needed as we keep roll zero.
-					axis.normalize();
+					axis.copy(up).setLength(mouse.x);
+					axis.add(up.cross(eye).setLength(mouse.y));
+					//axis.add(eye.setLength(mouse.z)); // z is not needed as we keep roll zero.
 
-					var angle = Math.sqrt(dx*dx+dy*dy) / 300;
+					// Those will prevent 'flipping' when `eye` vector comes too close to `up` vector.
+					// If angle between vec1 and vec2 > 90, then flipping occurred.
+					var vec1 = new THREE.Vector3();
+					vec1.crossVectors(camera.up, camera.position);
 
-					var quaternion = new THREE.Quaternion();
-					quaternion.setFromAxisAngle(axis, -angle);
-					camera.position.applyQuaternion(quaternion);
+					// Apply the changes.
+					camera.position.applyAxisAngle(axis, -angle);
 
-					console.log(camera.up);
+					var vec2 = new THREE.Vector3();
+					vec2.crossVectors(camera.up, camera.position);
+
+					// `Flip` occurred.
+					if (vec1.dot(vec2) < 0) {
+						// Mirror position back.
+						camera.position.reflect(camera.up).negate();
+						//console.log("flip prevented");
+					}
 
 					camera.lookAt(new THREE.Vector3(0,0,0));
 					render();
