@@ -5,11 +5,12 @@ angular.module('me.lazerka.orbit', [])
 		var renderer = new THREE.WebGLRenderer({alpha: true});
 		var scene = new THREE.Scene();
 		var camera = new THREE.PerspectiveCamera(
-			30, // fov
+			45, // fov
 			1, // aspect
 			10, // near
 			100000000 // far
 		);
+		//var camera = new THREE.CubeCamera(10, 100000000, 1024);
 
 		var lastTime = 0;
 		var celestials = [];
@@ -107,6 +108,7 @@ angular.module('me.lazerka.orbit', [])
 					axis.copy(up).setLength(mouse.x);
 					axis.add(up.cross(eye).setLength(mouse.y));
 					//axis.add(eye.setLength(mouse.z)); // z is not needed as we keep roll zero.
+					// Already normalized, because `mouse` is normalized.
 
 					// Those will prevent 'flipping' when `eye` vector comes too close to `up` vector.
 					// If angle between vec1 and vec2 > 90, then flipping occurred.
@@ -123,7 +125,11 @@ angular.module('me.lazerka.orbit', [])
 					if (vec1.dot(vec2) < 0) {
 						// Put position back.
 						camera.position.copy(eye);
-						//console.log("flip prevented");
+						// Move only along mouse.x
+						up.copy(camera.up).multiplyScalar(mouse.x).normalize();
+						camera.position.applyAxisAngle(up, -angle);
+
+						console.log("flip prevented");
 					}
 
 					camera.lookAt(new THREE.Vector3(0,0,0));
@@ -172,10 +178,9 @@ angular.module('me.lazerka.orbit', [])
 				var orbit = parseInt(scope.orbit);
 
 				var geometry = new THREE.SphereGeometry(radius, 32, 32);
-				var texture = THREE.ImageUtils.loadTexture('img/kerbin.jpg', null, onTextureLoaded);
+				var texture = THREE.ImageUtils.loadTexture('img/' + scope.name + '.jpg', null, onTextureLoaded);
 
 				var material = new THREE.MeshBasicMaterial({
-					color: parseInt(scope.color, 16),
 					map: texture
 					//wireframe: true
 				});
