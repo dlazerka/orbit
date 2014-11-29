@@ -121,8 +121,8 @@ angular.module('me.lazerka.orbit', [])
 
 					// `Flip` occurred.
 					if (vec1.dot(vec2) < 0) {
-						// Mirror position back.
-						camera.position.reflect(camera.up).negate();
+						// Put position back.
+						camera.position.copy(eye);
 						//console.log("flip prevented");
 					}
 
@@ -172,9 +172,11 @@ angular.module('me.lazerka.orbit', [])
 				var orbit = parseInt(scope.orbit);
 
 				var geometry = new THREE.SphereGeometry(radius, 32, 32);
+				var texture = THREE.ImageUtils.loadTexture('img/kerbin.jpg');
 				var material = new THREE.MeshBasicMaterial({
 					color: parseInt(scope.color, 16),
-					wireframe: true
+					map: texture
+					//wireframe: true
 				});
 				var mesh = new THREE.Mesh(geometry, material);
 
