@@ -39,8 +39,41 @@ celestial, .celestial {
 	left: 49%;
 }
 
-.info {
+.info,
+.info2 {
 	position: absolute;
 	top: 10px;
+	font-family: monospace;
+	font-weight: bold;
+	color: white;
+}
+
+.info {
 	left: 10px;
+}
+
+.info .stats {
+	display: none;
+}
+
+.info2 {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+}
+
+.rotate_lock .axis {
+	background-color: black;
+	color: white;
+	border: 2px white solid;
+	border-radius: 5px;
+	display: inline-block;
+	font-weight: bold;
+	padding: 2px 5px;
+	user-select: none;
+}
+
+.rotate_lock .axis.active {
+	background-color: white;
+	color: black;
 }

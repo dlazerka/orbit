@@ -25,7 +25,18 @@ var Stats = function () {
 	fpsText.innerHTML = 'FPS';
 	fpsDiv.appendChild( fpsText );
 
+	var fpsGraph = document.createElement( 'div' );
+	fpsGraph.id = 'fpsGraph';
+	fpsGraph.style.cssText = 'position:relative;width:74px;height:30px;background-color:#0ff';
+	fpsDiv.appendChild( fpsGraph );
 
+	while ( fpsGraph.children.length < 74 ) {
+
+		var bar = document.createElement( 'span' );
+		bar.style.cssText = 'width:1px;height:30px;float:left;background-color:#113';
+		fpsGraph.appendChild( bar );
+
+	}
 
 	var msDiv = document.createElement( 'div' );
 	msDiv.id = 'ms';
@@ -37,6 +48,19 @@ var Stats = function () {
 	msText.style.cssText = 'color:#0f0;font-family:Helvetica,Arial,sans-serif;font-size:9px;font-weight:bold;line-height:15px';
 	msText.innerHTML = 'MS';
 	msDiv.appendChild( msText );
+
+	var msGraph = document.createElement( 'div' );
+	msGraph.id = 'msGraph';
+	msGraph.style.cssText = 'position:relative;width:74px;height:30px;background-color:#0f0';
+	msDiv.appendChild( msGraph );
+
+	while ( msGraph.children.length < 74 ) {
+
+		var bar = document.createElement( 'span' );
+		bar.style.cssText = 'width:1px;height:30px;float:left;background-color:#131';
+		msGraph.appendChild( bar );
+
+	}
 
 	var setMode = function ( value ) {
 
@@ -86,6 +110,7 @@ var Stats = function () {
 			msMax = Math.max( msMax, ms );
 
 			msText.textContent = ms + ' MS (' + msMin + '-' + msMax + ')';
+			updateGraph( msGraph, Math.min( 30, 30 - ( ms / 200 ) * 30 ) );
 
 			frames ++;
 
@@ -96,6 +121,7 @@ var Stats = function () {
 				fpsMax = Math.max( fpsMax, fps );
 
 				fpsText.textContent = fps + ' FPS (' + fpsMin + '-' + fpsMax + ')';
+				updateGraph( fpsGraph, Math.min( 30, 30 - ( fps / 100 ) * 30 ) );
 
 				prevTime = time;
 				frames = 0;

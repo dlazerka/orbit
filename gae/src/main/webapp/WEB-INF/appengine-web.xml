@@ -11,7 +11,7 @@
 
 		<include path="/font/*" expiration="365d"/>
 
-		<include path="/img/*"/>
+		<include path="/img/**"/>
 
 		<include path="/**.js"/>
 		<include path="/**.css"/>

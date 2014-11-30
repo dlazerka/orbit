@@ -17,7 +17,12 @@ angular.module('me.lazerka.orbit')
 				};
 
 				function shouldHandle(event) {
-					return event.which == 3 && !event.ctrlKey && !event.metaKey && !event.shiftKey;
+					return event.which == 3
+						&& event.target.nodeName == 'CANVAS'
+						&& !event.ctrlKey
+						&& !event.metaKey
+						&& !event.shiftKey
+						;
 				}
 				function stopDragging(event) {
 					dragging.which = null;
