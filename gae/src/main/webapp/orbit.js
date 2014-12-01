@@ -204,7 +204,7 @@ angular.module('me.lazerka.orbit', [])
 				var radius = scope.equator / 2 / Math.PI / GLOBAL_SCALE;
 				var orbit = parseInt(scope.orbit) / GLOBAL_SCALE;
 
-				var geometry = new THREE.SphereGeometry(radius, 38, 38);
+				var geometry = new THREE.IcosahedronGeometry(radius, 3);
 				var texture = THREE.ImageUtils.loadTexture('img/' + scope.name + '.jpg', null, onTextureLoaded);
 
 				var material = new THREE.MeshBasicMaterial({
