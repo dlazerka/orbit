@@ -45,8 +45,6 @@ angular.module('me.lazerka.orbit', [])
 		}
 		initBackground();
 
-		//var camera = new THREE.CubeCamera(10, 100000000, 1024);
-
 		var lastTime = 0;
 		var celestials = [];
 
@@ -166,11 +164,6 @@ angular.module('me.lazerka.orbit', [])
 					//axis.add(eye.setLength(mouse.z)); // z is not needed as we keep roll zero.
 					// Already normalized, because `mouse` is normalized.
 
-					// Those will prevent 'flipping' when `eye` vector comes too close to `up` vector.
-					// If angle between vec1 and vec2 > 90, then flipping occurred.
-					var vec1 = new THREE.Vector3();
-					vec1.crossVectors(camera.up, camera.position);
-
 					// Apply the changes.
 					camera.position.applyAxisAngle(axis, -angle);
 
@@ -179,18 +172,14 @@ angular.module('me.lazerka.orbit', [])
 						camera.up.applyAxisAngle(axis, -angle);
 					}
 
-					var vec2 = new THREE.Vector3();
-					vec2.crossVectors(camera.up, camera.position);
-
+					// Those will detect 'flip' when `eye` vector comes on the other side of `up` vector.
+					// If angle between vec1 and vec2 > 90, then `flip` occurred.
+					var vec1 = camera.up.clone().cross(eye);
+					var vec2 = camera.up.clone().cross(camera.position);
 					// `Flip` occurred.
 					if (vec1.dot(vec2) < 0) {
-						// Put position back.
-						camera.position.copy(eye);
-						// Move only along mouse.x
-						up.copy(camera.up).multiplyScalar(mouse.x).normalize();
-						camera.position.applyAxisAngle(up, -angle);
-
-						//console.log("flip prevented");
+						camera.up.negate();
+						console.log("flip");
 					}
 
 					camera.lookAt(new THREE.Vector3(0,0,0));
