@@ -19,29 +19,29 @@ angular.module('me.lazerka.orbit', [])
 		);
 
 		function initBackground() {
-			var texture = THREE.ImageUtils.loadTextureCube([
+			THREE.ImageUtils.loadTextureCube([
 				'img/space/-x.jpg',
 				'img/space/x.jpg',
 				'img/space/y.jpg',
 				'img/space/-y.jpg',
 				'img/space/z.jpg',
 				'img/space/-z.jpg'
-			], null, render);
+			], null, function(texture) {
+				// Couldn't make shader work :(.
+				//var shader = THREE.ShaderLib["cube"];
+				//var uniforms = THREE.UniformsUtils.clone(shader.uniforms);
+				//uniforms['tCube'].texture = texture;
+				//var shaderMaterial = new THREE.ShaderMaterial({
+				//	fragmentShader: shader.fragmentShader,
+				//	vertexShader: shader.vertexShader,
+				//	uniforms: uniforms
+				//});
 
-			// Couldn't make shader work :(.
-			//var shader = THREE.ShaderLib["cube"];
-			//var uniforms = THREE.UniformsUtils.clone(shader.uniforms);
-			//uniforms['tCube'].texture = texture;
-			//var shaderMaterial = new THREE.ShaderMaterial({
-			//	fragmentShader: shader.fragmentShader,
-			//	vertexShader: shader.vertexShader,
-			//	uniforms: uniforms
-			//});
-
-			var material = new THREE.MeshBasicMaterial({envMap: texture});
-			// Dunno why but here must be at least one negative in order to work.
-			var box = new THREE.BoxGeometry(-100000, -100000, -100000);
-			scene.add(new THREE.Mesh(box, material));
+				var material = new THREE.MeshBasicMaterial({envMap: texture});
+				// Dunno why but here must be at least one negative in order to work.
+				var box = new THREE.BoxGeometry(-100000, -100000, -100000);
+				scene.add(new THREE.Mesh(box, material));
+			});
 		}
 		initBackground();
 
@@ -51,9 +51,6 @@ angular.module('me.lazerka.orbit', [])
 		var stats = new Stats();
 		stats.setMode(1);
 
-		function render() {
-			renderer.render(scene, camera);
-		}
 		function updateTime(time) {
 			var dt = (time - lastTime) / 1000;
 			lastTime = time;
@@ -69,6 +66,15 @@ angular.module('me.lazerka.orbit', [])
 				 }
 				 */
 			}
+		}
+
+		function renderLoop(time) {
+			stats.begin();
+			//updateTime(time);
+			renderer.render(scene, camera);
+
+			stats.end();
+			$window.requestAnimationFrame(renderLoop);
 		}
 
 		return {
@@ -93,7 +99,6 @@ angular.module('me.lazerka.orbit', [])
 					}
 
 					camera.lookAt(new THREE.Vector3(0,0,0));
-					render();
 				});
 
 				renderer.setSize(element.innerWidth(), element.innerHeight());
@@ -104,44 +109,20 @@ angular.module('me.lazerka.orbit', [])
 					renderer.setSize(element.innerWidth(), element.innerHeight());
 					camera.aspect = element.innerWidth() / element.innerHeight();
 					camera.updateProjectionMatrix();
-					render();
 				});
 
 				element.prepend(renderer.domElement);
 
 				$('.stats', element).append(stats.domElement);
 
-				render(0);
-
+				renderLoop(0);
 			},
 			controller: function($scope) {
-				$scope.playing = null;
 				$scope.warp = 1;
 				// Distance between camera and target point.
 				$scope.distance = 1;
 
 				camera.position.set(0, 0, 1);
-
-				$scope.play = function() {
-					$scope.playing = true;
-					renderLoop(0);
-				};
-				function renderLoop(time) {
-					stats.begin();
-					updateTime(time);
-					render();
-
-					if (!$scope.playing) {
-						return;
-					}
-					stats.end();
-					$window.requestAnimationFrame(renderLoop);
-				}
-
-				$scope.pause = function() {
-					//$interval.cancel($scope.playing);
-					$scope.playing = false;
-				};
 
 				/**
 				 * Orbital controls: roll is always zero. I.e. camera.up==(0,1,0);
@@ -161,8 +142,8 @@ angular.module('me.lazerka.orbit', [])
 					var axis = new THREE.Vector3();
 					axis.copy(up).setLength(mouse.x);
 					axis.add(up.cross(eye).setLength(mouse.y));
-					//axis.add(eye.setLength(mouse.z)); // z is not needed as we keep roll zero.
-					// Already normalized, because `mouse` is normalized.
+					//axis.add(eye.setLength(mouse.z)); // z is not needed.
+					// axis is already normalized, because `mouse` is normalized.
 
 					// Apply the changes.
 					camera.position.applyAxisAngle(axis, -angle);
@@ -183,7 +164,6 @@ angular.module('me.lazerka.orbit', [])
 					}
 
 					camera.lookAt(new THREE.Vector3(0,0,0));
-					render();
 				};
 
 				this.addCelestial = function(mesh, position, velocity, mass) {
@@ -199,13 +179,11 @@ angular.module('me.lazerka.orbit', [])
 					});
 
 					scene.add(mesh);
-					render();
 				};
 
 				this.setDistance = function(newDistance) {
 					$scope.distance = newDistance * GLOBAL_SCALE;
 					camera.position.setLength(newDistance);
-					render();
 				};
 			}
 		};

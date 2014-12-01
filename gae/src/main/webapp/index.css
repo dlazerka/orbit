@@ -11,7 +11,7 @@ button {
 	display: block;
 	position: absolute;
 	height: auto;
-	padding: 20px;
+	padding: 0px;
 	top: 0;
 	right: 0;
 	bottom: 0;
@@ -76,4 +76,8 @@ celestial, .celestial {
 .rotate_lock .axis.active {
 	background-color: white;
 	color: black;
+}
+
+.rotate_lock button {
+	cursor: pointer;
 }
