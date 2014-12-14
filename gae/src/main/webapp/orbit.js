@@ -6,13 +6,13 @@ angular.module('me.lazerka.orbit', [])
 	 * For example, on 50m Kerbin and Mun are visible through each other.
 	 */
 	.constant('GLOBAL_SCALE', 100000)
-	.directive('pane', function($window, GLOBAL_SCALE) {
+	.directive('pane', function($window, smooth) {
 		var renderer = new THREE.WebGLRenderer({
 			antialias: true
 		});
 		var scene = new THREE.Scene();
 		var camera = new THREE.PerspectiveCamera(
-			70, // fov
+			40, // fov
 			1, // aspect (will be updated from element width)
 			1, // near
 			100000 // far
@@ -71,6 +71,7 @@ angular.module('me.lazerka.orbit', [])
 		function renderLoop(time) {
 			stats.begin();
 			//updateTime(time);
+			THREE.AnimationHandler.update(time);
 			renderer.render(scene, camera);
 
 			stats.end();
@@ -79,26 +80,40 @@ angular.module('me.lazerka.orbit', [])
 
 		return {
 			restrict: 'E',
-			link : function(scope, element, attrs) {
+			link : function(scope, element, unusedAttrs) {
 				scope.up = 'y';
 				camera.up.set(0, 1, 0);
 				scope.$watch('up', function(newVal, oldVal) {
-					if (newVal) {
-						camera.up.set(0, 0, 0);
-						camera.up[newVal] = 1;
-						console.log('camera.up now ' + camera.up.toArray());
-
-						var eps = 1 / 0xffffffff;
-						var cross = camera.position.clone().cross(camera.up);
-						if (cross.length() < eps) {
-							console.log('camera.up matches with camera.z, moving a little');
-							var axis = new THREE.Vector3(Math.SQRT1_2, Math.SQRT1_2, 0);
-							camera.position.applyAxisAngle(axis, eps);
-							console.log('camera.position now ' + camera.position.toArray());
-						}
+					if (!newVal) {
+						return;
 					}
 
-					camera.lookAt(new THREE.Vector3(0,0,0));
+					var oldUp = camera.up.clone();
+					var newUp = new THREE.Vector3(0, 0, 0);
+					newUp[newVal] = 1;
+
+					smooth.enqueue(rotateGimbal, 'rotateGimbal', 600, true);
+
+					function rotateGimbal(t) {
+						camera.up.copy(oldUp)
+							.lerp(newUp, t)
+							.normalize();
+						console.log('camera.up now ' + camera.up.toArray());
+
+						if (t == 1) {
+							var eps = 1 / 0xffffffff;
+							var cross = camera.position.clone().cross(camera.up);
+							if (cross.length() < eps) {
+								console.log('camera.up matches with camera.position, moving a little.');
+								// Random axis, to not match any of main axes.
+								var axis = new THREE.Vector3(Math.SQRT1_2, Math.SQRT1_2, 0);
+								camera.position.applyAxisAngle(axis, eps);
+								console.log('camera.position now ' + camera.position.toArray());
+							}
+						}
+
+						camera.lookAt(new THREE.Vector3(0, 0, 0));
+					}
 				});
 
 				renderer.setSize(element.innerWidth(), element.innerHeight());
@@ -163,6 +178,9 @@ angular.module('me.lazerka.orbit', [])
 						console.log("flip");
 					}
 
+					// We could also record the `flipped` state, and invert dx, then it would be very much like
+					// Blender does, just we need to clear the `flipped` bit once mouse button is released.
+
 					camera.lookAt(new THREE.Vector3(0,0,0));
 				};
 
@@ -182,7 +200,6 @@ angular.module('me.lazerka.orbit', [])
 				};
 
 				this.setDistance = function(newDistance) {
-					$scope.distance = newDistance * GLOBAL_SCALE;
 					camera.position.setLength(newDistance);
 				};
 			}
@@ -204,7 +221,7 @@ angular.module('me.lazerka.orbit', [])
 				var radius = scope.equator / 2 / Math.PI / GLOBAL_SCALE;
 				var orbit = parseInt(scope.orbit) / GLOBAL_SCALE;
 
-				var geometry = new THREE.IcosahedronGeometry(radius, 3);
+				var geometry = new THREE.SphereGeometry(radius, 32, 32);
 				var texture = THREE.ImageUtils.loadTexture('img/' + scope.name + '.jpg', null, onTextureLoaded);
 
 				var material = new THREE.MeshBasicMaterial({
