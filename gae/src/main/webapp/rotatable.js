@@ -17,7 +17,7 @@ angular.module('me.lazerka.orbit')
 					x: null,
 					y: null
 				};
-				var camera = pane.getCamera();
+				var camera = pane.camera;
 
 				scope.$watch('up', function(newVal, oldVal) {
 					if (!newVal || newVal == oldVal) {
@@ -34,7 +34,6 @@ angular.module('me.lazerka.orbit')
 						camera.up.copy(oldUp)
 							.lerp(newUp, t)
 							.normalize();
-						console.log('camera.up now ' + camera.up.toArray());
 
 						if (t == 1) {
 							var eps = 1 / 0xffffffff;
@@ -65,8 +64,7 @@ angular.module('me.lazerka.orbit')
 					var up = new THREE.Vector3();
 					up.copy(camera.up);
 
-					var eye = new THREE.Vector3();
-					eye.copy(camera.position);
+					var eye = camera.position.clone().sub(scope.lookingAt);
 
 					var axis = new THREE.Vector3();
 					axis.copy(up).setLength(mouse.x);
@@ -75,25 +73,30 @@ angular.module('me.lazerka.orbit')
 					// axis is already normalized, because `mouse` is normalized.
 
 					// Apply the changes.
-					camera.position.applyAxisAngle(axis, -angle);
+					camera.position
+						.sub(scope.lookingAt)
+						.applyAxisAngle(axis, -angle)
+						.add(scope.lookingAt)
+					;
 
 					// If camera.up is not locked by user, then rotate it too.
 					if (!scope.up) {
 						camera.up.applyAxisAngle(axis, -angle);
+					} else {
+						// This detects 'flip' when `eye` vector comes on the other side of `up` vector.
+						// If angle between vec1 and vec2 > 90, then `flip` occurred.
+						var eyeNew = camera.position.clone().sub(scope.lookingAt);
+						var vec1 = camera.up.clone().cross(eye);
+						var vec2 = camera.up.clone().cross(eyeNew);
+						if (vec1.dot(vec2) < 0) { // angle > 90
+							console.log('flip');
+							camera.up.negate();
+						}
 					}
 
-					// Those will detect 'flip' when `eye` vector comes on the other side of `up` vector.
-					// If angle between vec1 and vec2 > 90, then `flip` occurred.
-					var vec1 = camera.up.clone().cross(eye);
-					var vec2 = camera.up.clone().cross(camera.position);
-					// `Flip` occurred.
-					if (vec1.dot(vec2) < 0) {
-						camera.up.negate();
-						console.log('flip');
-					}
-
-					// We could also record the `flipped` state, and invert dx, then it would be very much like
-					// Blender does, just we need to clear the `flipped` bit once mouse button is released.
+					// We could also record the `flipped` state, and negate dx in 'flipped' state,
+					// then it would be pretty much like Blender does. But for that we'd need to clear the `flipped`
+					// state once mouse button is released.
 
 					camera.lookAt(scope.lookingAt);
 				}

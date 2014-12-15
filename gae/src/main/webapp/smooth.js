@@ -18,15 +18,16 @@ angular.module('me.lazerka.orbit')
 		// 4ms minimum per HTML5 spec.
 		var BETWEEN_MS = 20;
 
-		function run(callback, d, queue, expectedCounter) {
+		function run(callback, tick, ticksNum, queue, expectedCounter) {
 			if (expectedCounter != queues[queue]) {
 				// Superseded by another execution.
 				return;
 			}
 
 			// Cubic Bezier of ((0, 0), (1, 0), (0, 1), (1, 1)), y-coordinate.
-			var smoothed = THREE.Shape.Utils.b3(d, 0, 0, 1, 1);
-			callback(smoothed);
+			var delta = THREE.Shape.Utils.b3(tick / ticksNum, 0, 0, 1, 1);
+			var deltaPrev = THREE.Shape.Utils.b3((tick - 1) / ticksNum, 0, 0, 1, 1);
+			callback(delta, deltaPrev);
 		}
 
 		return {
@@ -41,9 +42,8 @@ angular.module('me.lazerka.orbit')
 				queues[queue]++;
 
 				for (var tick = 1; tick <= ticksNum ; tick++) {
-					var d = tick / ticksNum;
-					var f = run.bind(this, callback, d, queue, queues[queue]);
-					$timeout(f, d * durationMs, !suppressDigest);
+					var f = run.bind(this, callback, tick, ticksNum, queue, queues[queue]);
+					$timeout(f, durationMs * tick / ticksNum, !suppressDigest);
 				}
 			}
 		}

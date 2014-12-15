@@ -1,7 +1,7 @@
 'use strict';
 angular.module('me.lazerka.orbit')
 	.directive('zoomable', function(GLOBAL_SCALE, smooth) {
-		var distances = [500, 250, 200, 150, 100, 75, 50, 40, 25, 15, 10, 7.5, 6.25, 5, 4, 3, 2.5, 2]
+		var distances = [500, 350, 250, 200, 150, 100, 75, 50, 35, 25, 15, 10, 7.5, 6.25, 5, 4, 3, 2.5, 2, 1.75, 1.5]
 			.map(function(a) {
 				return a * 100000;
 			});
@@ -45,12 +45,12 @@ angular.module('me.lazerka.orbit')
 					var newDistance = distances[zoomIndex];
 
 					// Make dollying smooth.
-					function a(smoothed) {
+					function dolly(smoothed) {
 						scope.distance = Math.round(oldDistance + (newDistance - oldDistance) * smoothed);
 						pane.setDistance(scope.distance / GLOBAL_SCALE);
 					}
 
-					smooth.enqueue(a, 'zoomable', 200);
+					smooth.enqueue(dolly, 'zoomable', 200);
 				});
 			}
 		};

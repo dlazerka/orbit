@@ -62,10 +62,6 @@ angular.module('me.lazerka.orbit')
 				scope.up = 'y';
 				camera.up.set(0, 1, 0);
 
-				scope.$watch('lookingAt', function(newVal, oldVal) {
-					camera.lookAt(newVal);
-				});
-
 				renderer.setSize(element.innerWidth(), element.innerHeight());
 				camera.aspect = element.innerWidth() / element.innerHeight();
 				camera.updateProjectionMatrix();
@@ -82,35 +78,39 @@ angular.module('me.lazerka.orbit')
 
 				renderLoop(0);
 			},
-			controller: function($scope) {
-				$scope.warp = 1;
-				// Distance between camera and target point.
-				$scope.distance = 1;
+			controller: function($scope, smooth) {
+				$scope.warp = 1; // TODO
+				// So that we don't need to calculate based on direction and distance every time.
 				$scope.lookingAt = new THREE.Vector3(0, 0, 0);
+				// Distance between camera.position and $scope.lookingAt.
+				$scope.distance = 1;
 
-				camera.position.set(0, 0, 1);
+				camera.lookAt($scope.lookingAt);
+				camera.position.set(0, 0, $scope.distance);
 
-				this.getCamera = function() {
-					return camera;
-				};
-
-				this.addCelestial = function(mesh, position, velocity, mass) {
-					mesh.position.add(position);
-					mesh.rotateX(Math.PI/2);
-					mesh.updateMatrix();
-
-					celestials.push({
-						mesh: mesh,
-						position: position,
-						velocity: velocity,
-						mass: mass
-					});
-
-					scene.add(mesh);
-				};
+				this.camera = camera;
+				this.scene = scene;
 
 				this.setDistance = function(newDistance) {
-					camera.position.setLength(newDistance);
+					camera.position
+						.sub($scope.lookingAt)
+						.setLength(newDistance)
+						.add($scope.lookingAt)
+					;
+				};
+				this.lookAt = function(newLookingAt) {
+					var oldLookingAt = $scope.lookingAt.clone();
+					console.log('Looking at ' + newLookingAt.toArray());
+
+					function moveLookingAt(delta, deltaPrev) {
+						$scope.lookingAt
+							.copy(oldLookingAt)
+							.lerp(newLookingAt, delta);
+						camera.position
+							.add(newLookingAt.clone().sub(oldLookingAt).multiplyScalar(delta - deltaPrev));
+					}
+
+					smooth.enqueue(moveLookingAt, 'lookAt', 300);
 				};
 			}
 		};

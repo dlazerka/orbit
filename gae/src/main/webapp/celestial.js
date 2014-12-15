@@ -29,7 +29,17 @@ angular.module('me.lazerka.orbit')
 				var velocity = {x: 0, y: 0, z: orbit ? -542.5: 0};
 
 				function onTextureLoaded() {
-					pane.addCelestial(mesh, position, velocity, mass);
+					mesh.position.add(position);
+					mesh.rotateX(Math.PI/2);
+					mesh.updateMatrix();
+
+					mesh.myData = {
+						velocity: velocity,
+						mass: mass,
+						textureUrl: scope.textureUrl
+					};
+
+					pane.scene.add(mesh);
 				}
 			}
 		};
