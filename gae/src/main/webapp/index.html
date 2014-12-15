@@ -13,9 +13,13 @@
 
 
 	<script type="text/javascript" src="orbit.js" defer></script>
-	<script type="text/javascript" src="zoomable.js" defer></script>
+
+	<script type="text/javascript" src="clickable.js" defer></script>
+	<script type="text/javascript" src="celestial.js" defer></script>
+	<script type="text/javascript" src="pane.js" defer></script>
 	<script type="text/javascript" src="rotatable.js" defer></script>
 	<script type="text/javascript" src="smooth.js" defer></script>
+	<script type="text/javascript" src="zoomable.js" defer></script>
 	<style type="text/css">
 		.ng-cloak {display: none;}
 	</style>
@@ -25,14 +29,14 @@
 <div class="stretch ng-cloak">
 	<pane class="pane" zoomable rotatable>
 		<celestial
-				name="kerbin"
+				texture-url="img/kerbin.jpg"
 				equator="600000"
 				mass="5.2915793e22"
 				orbit="0"
 				color="87cefa"
 				></celestial>
 		<celestial
-				name="mun"
+				texture-url="img/mun.jpg"
 				equator="200000"
 				orbit="1200000"
 				mass="9.7600236e20"
@@ -49,7 +53,7 @@
 		<div class="info2">
 			<div class="scroll_memo">Scroll to zoom</div>
 			<div class="rotate_memo">Right-click to rotate camera</div>
-			<div class="rotate_lock">Lock camera:
+			<div class="rotate_lock">Camera up:
 				<button class="axis x" ng-class="{active: up == 'x'}" ng-click="up='x'">x</button>
 				<button class="axis y" ng-class="{active: up == 'y'}" ng-click="up='y'">y</button>
 				<button class="axis z" ng-class="{active: up == 'z'}" ng-click="up='z'">z</button>
