@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 angular.module('me.lazerka.orbit')
 	.directive('zoomable', function(smooth) {
 		var distances = [500, 250, 200, 150, 100, 75, 50, 40, 25, 15, 10, 7.5, 6.25, 5, 4, 3, 2.5, 2]

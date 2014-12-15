@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 // $(foo) is done for jsFiddle, it has problems loading jQuery right.
 angular.module('me.lazerka.orbit', [])
 	/**
@@ -6,7 +6,7 @@ angular.module('me.lazerka.orbit', [])
 	 * For example, on 50m Kerbin and Mun are visible through each other.
 	 */
 	.constant('GLOBAL_SCALE', 100000)
-	.directive('pane', function($window, smooth) {
+	.directive('pane', function($window) {
 		var renderer = new THREE.WebGLRenderer({
 			antialias: true
 		});
@@ -28,7 +28,7 @@ angular.module('me.lazerka.orbit', [])
 				'img/space/-z.jpg'
 			], null, function(texture) {
 				// Couldn't make shader work :(.
-				//var shader = THREE.ShaderLib["cube"];
+				//var shader = THREE.ShaderLib['cube'];
 				//var uniforms = THREE.UniformsUtils.clone(shader.uniforms);
 				//uniforms['tCube'].texture = texture;
 				//var shaderMaterial = new THREE.ShaderMaterial({
@@ -80,40 +80,12 @@ angular.module('me.lazerka.orbit', [])
 
 		return {
 			restrict: 'E',
-			link : function(scope, element, unusedAttrs) {
+			link : function(scope, element, attrs) {
 				scope.up = 'y';
 				camera.up.set(0, 1, 0);
-				scope.$watch('up', function(newVal, oldVal) {
-					if (!newVal) {
-						return;
-					}
 
-					var oldUp = camera.up.clone();
-					var newUp = new THREE.Vector3(0, 0, 0);
-					newUp[newVal] = 1;
-
-					smooth.enqueue(rotateGimbal, 'rotateGimbal', 600, true);
-
-					function rotateGimbal(t) {
-						camera.up.copy(oldUp)
-							.lerp(newUp, t)
-							.normalize();
-						console.log('camera.up now ' + camera.up.toArray());
-
-						if (t == 1) {
-							var eps = 1 / 0xffffffff;
-							var cross = camera.position.clone().cross(camera.up);
-							if (cross.length() < eps) {
-								console.log('camera.up matches with camera.position, moving a little.');
-								// Random axis, to not match any of main axes.
-								var axis = new THREE.Vector3(Math.SQRT1_2, Math.SQRT1_2, 0);
-								camera.position.applyAxisAngle(axis, eps);
-								console.log('camera.position now ' + camera.position.toArray());
-							}
-						}
-
-						camera.lookAt(new THREE.Vector3(0, 0, 0));
-					}
+				scope.$watch('lookingAt', function(newVal, oldVal) {
+					camera.lookAt(newVal);
 				});
 
 				renderer.setSize(element.innerWidth(), element.innerHeight());
@@ -136,52 +108,12 @@ angular.module('me.lazerka.orbit', [])
 				$scope.warp = 1;
 				// Distance between camera and target point.
 				$scope.distance = 1;
+				$scope.lookingAt = new THREE.Vector3(0, 0, 0);
 
 				camera.position.set(0, 0, 1);
 
-				/**
-				 * Orbital controls: roll is always zero. I.e. camera.up==(0,1,0);
-				 */
-				this.rotateCameraBy = function(dx, dy) {
-					var mouse = new THREE.Vector2(dx, dy);
-					var angle = mouse.length() / 300;
-					mouse.normalize();
-
-					// Always (0, 1, 0) actually, but code below doesn't depend on it.
-					var up = new THREE.Vector3();
-					up.copy(camera.up);
-
-					var eye = new THREE.Vector3();
-					eye.copy(camera.position);
-
-					var axis = new THREE.Vector3();
-					axis.copy(up).setLength(mouse.x);
-					axis.add(up.cross(eye).setLength(mouse.y));
-					//axis.add(eye.setLength(mouse.z)); // z is not needed.
-					// axis is already normalized, because `mouse` is normalized.
-
-					// Apply the changes.
-					camera.position.applyAxisAngle(axis, -angle);
-
-					// If camera.up is not locked by user, then rotate it too.
-					if (!$scope.up) {
-						camera.up.applyAxisAngle(axis, -angle);
-					}
-
-					// Those will detect 'flip' when `eye` vector comes on the other side of `up` vector.
-					// If angle between vec1 and vec2 > 90, then `flip` occurred.
-					var vec1 = camera.up.clone().cross(eye);
-					var vec2 = camera.up.clone().cross(camera.position);
-					// `Flip` occurred.
-					if (vec1.dot(vec2) < 0) {
-						camera.up.negate();
-						console.log("flip");
-					}
-
-					// We could also record the `flipped` state, and invert dx, then it would be very much like
-					// Blender does, just we need to clear the `flipped` bit once mouse button is released.
-
-					camera.lookAt(new THREE.Vector3(0,0,0));
+				this.getCamera = function() {
+					return camera;
 				};
 
 				this.addCelestial = function(mesh, position, velocity, mass) {

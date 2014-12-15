@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 angular.module('me.lazerka.orbit')
 	.factory('smooth', function($timeout) {
 		// Map of queue names to queue counter.
