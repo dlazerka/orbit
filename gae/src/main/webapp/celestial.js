@@ -29,9 +29,7 @@ angular.module('me.lazerka.orbit')
 				var velocity = {x: 0, y: 0, z: orbit ? -542.5: 0};
 
 				function onTextureLoaded() {
-					mesh.position.add(position);
-					mesh.rotateX(Math.PI/2);
-					mesh.updateMatrix();
+					mesh.position.copy(position);
 
 					mesh.myData = {
 						velocity: velocity,
