@@ -8,7 +8,6 @@
         </element>
         <element id="directory" name="lib">
           <element id="library" level="project" name="AppEngine API" />
-          <element id="file-copy" path="$MAVEN_REPOSITORY$/com/google/appengine/appengine-api-1.0-sdk/1.9.15/appengine-api-1.0-sdk-1.9.15.jar" />
         </element>
       </element>
     </root>

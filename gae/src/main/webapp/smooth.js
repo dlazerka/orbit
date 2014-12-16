@@ -32,7 +32,7 @@ angular.module('me.lazerka.orbit')
 
 		return {
 			enqueue: function (callback, queue, durationMs, suppressDigest) {
-				if (durationMs <= 20) {
+				if (durationMs <= BETWEEN_MS) {
 					throw new Error('durationMs must be more than 20ms');
 				}
 
