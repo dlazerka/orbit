@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="exploded-war" name="gae-prod">
-    <output-path>$PROJECT_DIR$/idea_out/artifacts/gae_prod</output-path>
+    <output-path>$PROJECT_DIR$/gae/build/artifacts/gae_prod</output-path>
     <root id="root">
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">

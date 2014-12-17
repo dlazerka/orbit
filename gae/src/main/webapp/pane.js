@@ -103,11 +103,13 @@ angular.module('me.lazerka.orbit')
 					console.log('Looking at ' + newLookingAt.toArray());
 
 					function moveLookingAt(delta, deltaPrev) {
-						$scope.lookingAt
-							.copy(oldLookingAt)
-							.lerp(newLookingAt, delta);
-						camera.position
-							.add(newLookingAt.clone().sub(oldLookingAt).multiplyScalar(delta - deltaPrev));
+						$scope.$apply(function() {
+							$scope.lookingAt
+								.copy(oldLookingAt)
+								.lerp(newLookingAt, delta);
+							camera.position
+								.add(newLookingAt.clone().sub(oldLookingAt).multiplyScalar(delta - deltaPrev));
+						});
 					}
 
 					smooth.enqueue(moveLookingAt, 'lookAt', 300);

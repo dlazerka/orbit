@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
 	<application>lazerka-orbit</application>
-	<version>01-lookat</version>
+	<version>02-cdn</version>
 
 	<threadsafe>true</threadsafe>
 

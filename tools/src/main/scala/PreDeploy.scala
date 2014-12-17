@@ -1,10 +1,20 @@
 import java.io._
-import scala.io.{BufferedSource, Source}
+
+import scala.io.Source
 
 /**
+ * Processes all .html files:
+ * Searches for strings like
+ * {{{
+ * &lt;script src="lib/jquery.js" cdn="//googleapis.cdn.com/jquery.min.js"&gt;
+ * }}}
+ * and replaces `src` with `cdn`.
+ *
  * @author Dzmitry Lazerka
  */
 object PreDeploy {
+	val cdnRegexp = """(src=)"([^"]+)"\s+cdn="([^"]+)"""".r
+
 	def main(args: Array[String]) {
 		val workingDir = new File(System.getProperty("user.dir"))
 		traverse(workingDir)
@@ -27,8 +37,7 @@ object PreDeploy {
 		val content = source.mkString
 		source.close()
 
-		var r = """(<script\s+type="text/javascript"\s+src=)"([^"]+)"\s+cdn="([^"]+)"""".r
-		val newContent = r.replaceAllIn(content, """$1"$3"""")
+		val newContent = cdnRegexp.replaceAllIn(content, """$1"$3"""")
 
 		val writer = new FileWriter(f)
 		writer.write(newContent)

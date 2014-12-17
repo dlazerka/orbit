@@ -9,4 +9,8 @@
 		<welcome-file>index.html</welcome-file>
 	</welcome-file-list>
 
+	<mime-mapping>
+		<extension>js</extension>
+		<mime-type>text/javascript; charset=UTF-8</mime-type>
+	</mime-mapping>
 </web-app>
