@@ -15,6 +15,7 @@
 	<script type="text/javascript" src="lib/stats.js" defer></script>
 
 	<script type="text/javascript" src="orbit.js" defer></script>
+	<script type="text/javascript" src="check-webgl.js" defer></script>
 	<script type="text/javascript" src="clickable.js" defer></script>
 	<script type="text/javascript" src="celestial.js" defer></script>
 	<script type="text/javascript" src="pane.js" defer></script>
@@ -26,6 +27,17 @@
 	</style>
 </head>
 <body ng-app="me.lazerka.orbit">
+
+<div class="check-webgl ng-cloak" check-webgl>
+	<div ng-show="!browserSupports">
+		Your browser does not support <a href="http://get.webgl.org/">WebGL</a>.
+	</div>
+
+	<div ng-show="browserSupports && !canvasOk">
+		Browser could not initialize WebGL.<br/>
+		Probably you need to update drivers, or <a href="http://get.webgl.org/troubleshooting">get a new browser</a>.
+	</div>
+</div>
 
 <div class="stretch ng-cloak">
 	<pane class="pane" zoomable rotatable clickable>
