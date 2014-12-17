@@ -1,9 +1,6 @@
 <component name="ArtifactManager">
-  <artifact type="exploded-war" name="gae">
-    <output-path>$PROJECT_DIR$/gae/build/exploded</output-path>
-    <properties id="ant-preprocessing">
-      <options enabled="true" />
-    </properties>
+  <artifact type="exploded-war" name="gae-local">
+    <output-path>$PROJECT_DIR$/gae/src/main/webapp</output-path>
     <root id="root">
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">

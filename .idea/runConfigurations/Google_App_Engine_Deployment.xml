@@ -1,12 +1,13 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Google App Engine Deployment" type="google-app-engine-deploy" factoryName="Google App Engine Deployment" singleton="true" server-name="Google App Engine">
-    <deployment type="artifact" name="gae" />
+    <deployment type="artifact" name="gae-prod" />
     <RunnerSettings RunnerId="DeployToServer" />
     <ConfigurationWrapper RunnerId="DeployToServer" />
     <method>
       <option name="BuildArtifacts" enabled="true">
-        <artifact name="gae" />
+        <artifact name="gae-prod" />
       </option>
+      <option name="ToolBeforeRunTask" enabled="true" actionId="Tool_External Tools_Pre-deploy hook" />
     </method>
   </configuration>
 </component>
