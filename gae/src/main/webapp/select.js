@@ -20,16 +20,6 @@ angular.module('me.lazerka.orbit')
 						;
 				}
 
-				function getChildren() {
-					var children = [];
-					angular.forEach(pane.scene.children, function(child) {
-						if (child.myData) {
-							children.push(child);
-						}
-					});
-					return children;
-				}
-
 				element.on('click', 'canvas', function(event) {
 					if (!shouldHandle(event)) return;
 					event.preventDefault();
@@ -44,27 +34,30 @@ angular.module('me.lazerka.orbit')
 						.sub(camera.position)
 						.normalize();
 					raycaster.set(camera.position, vector);
-					var intersects = raycaster.intersectObjects(getChildren());
 
-					if (!intersects.length) {
-						return;
+					angular.forEach(scope.celestials, function(celestial) {
+						var intersection = raycaster.intersectObject(celestial.mesh);
+						if (intersection.length) {
+							select(celestial);
+						}
+					});
+
+					function select(celestial) {
+						var newLookingAt = celestial.mesh.position;
+
+						var oldLookingAt = scope.lookingAt.clone();
+						console.log('Looking at ' + newLookingAt.toArray());
+
+						function moveLookingAt(delta, deltaPrev) {
+							scope.lookingAt
+								.copy(oldLookingAt)
+								.lerp(newLookingAt, delta);
+							camera.position
+								.add(newLookingAt.clone().sub(oldLookingAt).multiplyScalar(delta - deltaPrev));
+						}
+
+						smooth.enqueue(moveLookingAt, 'select', 250);
 					}
-
-					var mesh = intersects[0].object;
-					var newLookingAt = mesh.position;
-
-					var oldLookingAt = scope.lookingAt.clone();
-					console.log('Looking at ' + newLookingAt.toArray());
-
-					function moveLookingAt(delta, deltaPrev) {
-						scope.lookingAt
-							.copy(oldLookingAt)
-							.lerp(newLookingAt, delta);
-						camera.position
-							.add(newLookingAt.clone().sub(oldLookingAt).multiplyScalar(delta - deltaPrev));
-					}
-
-					smooth.enqueue(moveLookingAt, 'select', 250);
 				});
 			}
 		};

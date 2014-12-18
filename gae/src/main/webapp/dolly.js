@@ -12,6 +12,14 @@ angular.module('me.lazerka.orbit')
 				// Set initial distance;
 				scope.distance = distances[6];
 
+				scope.$watch('distance', function(distance) {
+					pane.camera.position
+						.sub(scope.lookingAt)
+						.setLength(distance / GLOBAL_SCALE)
+						.add(scope.lookingAt)
+					;
+				});
+
 				element.bind('wheel', function(event){
 					event = event.originalEvent || event;
 					if (event.ctrlKey || event.metaKey || event.shiftKey) {

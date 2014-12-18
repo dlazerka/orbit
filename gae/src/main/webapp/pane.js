@@ -30,37 +30,14 @@ angular.module('me.lazerka.orbit')
 		initBackground();
 
 		var lastTime = 0;
-		var celestials = [];
 
 		var stats = new Stats();
 		stats.setMode(1);
 
-		// TODO celestial movement
-		function updateTime(time) {
-			var dt = (time - lastTime) / 1000;
-			lastTime = time;
-
-			for (var i = 0; i < celestials.length; i++) {
-				var celestial = celestials[i];
-				celestial.mesh.rotateY(dt * Math.PI / 10);
-			}
-		}
-
-		function renderLoop(time) {
-			stats.begin();
-			//updateTime(time);
-			THREE.AnimationHandler.update(time);
-			renderer.render(scene, camera);
-
-			stats.end();
-			$window.requestAnimationFrame(renderLoop);
-		}
-
 		return {
 			restrict: 'E',
 			link : function(scope, element, attrs) {
-				scope.up = 'y';
-				camera.up.set(0, 1, 0);
+				//camera.up.set(0, 1, 0);
 
 				renderer.setSize(element.innerWidth(), element.innerHeight());
 				camera.aspect = element.innerWidth() / element.innerHeight();
@@ -77,6 +54,16 @@ angular.module('me.lazerka.orbit')
 				$('.stats', element).append(stats.domElement);
 
 				renderLoop(0);
+
+				function renderLoop(time) {
+					stats.begin();
+
+					scope.$broadcast('frame', time);
+					renderer.render(scene, camera);
+
+					stats.end();
+					$window.requestAnimationFrame(renderLoop);
+				}
 			},
 			controller: function($scope) {
 				$scope.warp = 1; // TODO
@@ -85,25 +72,19 @@ angular.module('me.lazerka.orbit')
 				// Distance between camera.position and $scope.lookingAt.
 				$scope.distance = 1;
 				$scope.fov = camera.fov = 70;
+				$scope.celestials = [];
+				$scope.up = 'y';
 
 				camera.lookAt($scope.lookingAt);
 				camera.position.set(0, 0, $scope.distance);
 
-				$scope.$watch('fov', function(newValue, oldValue) {
-					camera.fov = newValue;
-					camera.updateProjectionMatrix();
-				});
-
-				$scope.$watch('distance', function(newDistance) {
-					camera.position
-						.sub($scope.lookingAt)
-						.setLength(newDistance / GLOBAL_SCALE)
-						.add($scope.lookingAt)
-					;
-				});
-
 				this.camera = camera;
 				this.scene = scene;
+
+				this.addCelestial = function(celestial) {
+					$scope.celestials.push(celestial);
+					scene.add(celestial.mesh);
+				}
 			}
 		};
 	})

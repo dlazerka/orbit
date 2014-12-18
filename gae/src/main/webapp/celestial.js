@@ -6,7 +6,6 @@ angular.module('me.lazerka.orbit')
 			require: '^pane',
 			scope: {
 				textureUrl: '@',
-				color: '@',
 				equator: '@',
 				orbit: '@',
 				mass: '@'
@@ -31,14 +30,25 @@ angular.module('me.lazerka.orbit')
 				function onTextureLoaded() {
 					mesh.position.copy(position);
 
-					mesh.myData = {
+					var celestial = {
+						mesh: mesh,
 						velocity: velocity,
 						mass: mass,
 						textureUrl: scope.textureUrl
 					};
 
-					pane.scene.add(mesh);
+					pane.addCelestial(celestial);
 				}
+
+				var yAxis = new THREE.Vector3(0, 1, 0);
+				//var angle = 1 / 400;
+				var angle = 0;
+				scope.$on('frame', function(event) {
+					mesh.rotateY(angle);
+					if (orbit) {
+						mesh.position.applyAxisAngle(yAxis, angle);
+					}
+				});
 			}
 		};
 	})

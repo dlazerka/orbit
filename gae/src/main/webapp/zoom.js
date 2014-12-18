@@ -16,6 +16,8 @@ angular.module('me.lazerka.orbit')
 					var wheelDirac = event.wheelDelta / Math.abs(event.wheelDelta);
 					scope.$apply(function() {
 						scope.fov -= wheelDirac;
+						pane.camera.fov = scope.fov;
+						pane.camera.updateProjectionMatrix();
 					});
 				});
 			}
