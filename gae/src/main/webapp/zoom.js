@@ -1,6 +1,6 @@
 'use strict';
 angular.module('me.lazerka.orbit')
-	.directive('zoom', function(GLOBAL_SCALE, smooth) {
+	.directive('zoom', function() {
 		return {
 			restrict: 'A',
 			require: '^pane',
@@ -13,8 +13,9 @@ angular.module('me.lazerka.orbit')
 					}
 					event.preventDefault();
 
+					var wheelDirac = event.wheelDelta / Math.abs(event.wheelDelta);
 					scope.$apply(function() {
-						scope.fov -= Math.round(event.wheelDelta / 24);
+						scope.fov -= wheelDirac;
 					});
 				});
 			}

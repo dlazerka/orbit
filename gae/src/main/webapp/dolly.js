@@ -9,10 +9,8 @@ angular.module('me.lazerka.orbit')
 			restrict: 'A',
 			require: '^pane',
 			link: function(scope, element, attrs, pane) {
-				scope.distance = distances[6];
-
 				// Set initial distance;
-				pane.setDistance(scope.distance / GLOBAL_SCALE);
+				scope.distance = distances[6];
 
 				element.bind('wheel', function(event){
 					event = event.originalEvent || event;
@@ -45,7 +43,6 @@ angular.module('me.lazerka.orbit')
 					// Make dollying smooth.
 					function dolly(smoothed) {
 						scope.distance = Math.round(oldDistance + (newDistance - oldDistance) * smoothed);
-						pane.setDistance(scope.distance / GLOBAL_SCALE);
 					}
 
 					smooth.enqueue(dolly, 'dolly', 200);

@@ -7,7 +7,7 @@
  *      So that far background points move opposite to mouse movements.
  */
 angular.module('me.lazerka.orbit')
-	.directive('rotatable', function(smooth) {
+	.directive('rotate', function(smooth) {
 		return {
 			restrict: 'A',
 			require: '^pane',

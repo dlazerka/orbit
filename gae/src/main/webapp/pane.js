@@ -1,6 +1,6 @@
 'use strict';
 angular.module('me.lazerka.orbit')
-	.directive('pane', function($window) {
+	.directive('pane', function($window, GLOBAL_SCALE) {
 		var renderer = new THREE.WebGLRenderer({
 			antialias: true
 		});
@@ -78,49 +78,32 @@ angular.module('me.lazerka.orbit')
 
 				renderLoop(0);
 			},
-			controller: function($scope, smooth) {
+			controller: function($scope) {
 				$scope.warp = 1; // TODO
 				// So that we don't need to calculate based on direction and distance every time.
 				$scope.lookingAt = new THREE.Vector3(0, 0, 0);
 				// Distance between camera.position and $scope.lookingAt.
 				$scope.distance = 1;
-				$scope.fov = camera.fov;
-
-				$scope.$watch('fov', function(newValue, oldValue) {
-					camera.fov = newValue;
-					camera.updateProjectionMatrix();
-					console.log('fov: ' + newValue);
-				});
+				$scope.fov = camera.fov = 70;
 
 				camera.lookAt($scope.lookingAt);
 				camera.position.set(0, 0, $scope.distance);
 
-				this.camera = camera;
-				this.scene = scene;
+				$scope.$watch('fov', function(newValue, oldValue) {
+					camera.fov = newValue;
+					camera.updateProjectionMatrix();
+				});
 
-				this.setDistance = function(newDistance) {
+				$scope.$watch('distance', function(newDistance) {
 					camera.position
 						.sub($scope.lookingAt)
-						.setLength(newDistance)
+						.setLength(newDistance / GLOBAL_SCALE)
 						.add($scope.lookingAt)
 					;
-				};
-				this.lookAt = function(newLookingAt) {
-					var oldLookingAt = $scope.lookingAt.clone();
-					console.log('Looking at ' + newLookingAt.toArray());
+				});
 
-					function moveLookingAt(delta, deltaPrev) {
-						$scope.$apply(function() {
-							$scope.lookingAt
-								.copy(oldLookingAt)
-								.lerp(newLookingAt, delta);
-							camera.position
-								.add(newLookingAt.clone().sub(oldLookingAt).multiplyScalar(delta - deltaPrev));
-						});
-					}
-
-					smooth.enqueue(moveLookingAt, 'lookAt', 300);
-				};
+				this.camera = camera;
+				this.scene = scene;
 			}
 		};
 	})

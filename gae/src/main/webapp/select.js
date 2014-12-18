@@ -4,7 +4,7 @@
  * Click on a celestial to set new camera.lookAt.
  */
 angular.module('me.lazerka.orbit')
-	.directive('clickable', function() {
+	.directive('select', function(smooth) {
 		return {
 			restrict: 'A',
 			require: '^pane',
@@ -46,10 +46,25 @@ angular.module('me.lazerka.orbit')
 					raycaster.set(camera.position, vector);
 					var intersects = raycaster.intersectObjects(getChildren());
 
-					if (intersects.length) {
-						var mesh = intersects[0].object;
-						pane.lookAt(mesh.position);
+					if (!intersects.length) {
+						return;
 					}
+
+					var mesh = intersects[0].object;
+					var newLookingAt = mesh.position;
+
+					var oldLookingAt = scope.lookingAt.clone();
+					console.log('Looking at ' + newLookingAt.toArray());
+
+					function moveLookingAt(delta, deltaPrev) {
+						scope.lookingAt
+							.copy(oldLookingAt)
+							.lerp(newLookingAt, delta);
+						camera.position
+							.add(newLookingAt.clone().sub(oldLookingAt).multiplyScalar(delta - deltaPrev));
+					}
+
+					smooth.enqueue(moveLookingAt, 'select', 250);
 				});
 			}
 		};
