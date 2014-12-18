@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Google App Engine Deployment" type="google-app-engine-deploy" factoryName="Google App Engine Deployment" singleton="true" server-name="Google App Engine">
+  <configuration default="false" name="Deploy" type="google-app-engine-deploy" factoryName="Google App Engine Deployment" singleton="true" server-name="Google App Engine">
     <deployment type="artifact" name="gae-prod" />
     <RunnerSettings RunnerId="DeployToServer" />
     <ConfigurationWrapper RunnerId="DeployToServer" />

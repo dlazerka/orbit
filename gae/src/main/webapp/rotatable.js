@@ -107,6 +107,10 @@ angular.module('me.lazerka.orbit')
 						&& !event.ctrlKey
 						&& !event.metaKey
 						&& !event.shiftKey
+						|| event.which == 1
+						&& !event.ctrlKey
+						&& event.metaKey  // For mac
+						&& !shiftKey.ctrlKey
 						;
 				}
 				function stopDragging(event) {

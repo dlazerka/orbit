@@ -26,7 +26,7 @@
 		.ng-cloak {display: none;}
 	</style>
 </head>
-<body ng-app="me.lazerka.orbit">
+<body ng-app="me.lazerka.orbit" ng-controller="OrbitController">
 
 <div class="check-webgl ng-cloak" check-webgl>
 	<div ng-show="!browserSupports">
@@ -64,9 +64,11 @@
 		</div>
 
 		<div class="info2">
-			<div class="look_at_memo">Left-click to select</div>
+			<div class="look_at_memo">Click to select</div>
 			<div class="scroll_memo">Scroll to dolly</div>
-			<div class="rotate_memo">Right-drag to rotate</div>
+			<div class="rotate_memo">
+				<span ng-hide="{{isMacOs}}">Right</span><span ng-show="{{isMacOs}}">Cmd</span>-drag to rotate
+			</div>
 			<div class="rotate_lock">Camera up:
 				<button class="axis x" ng-class="{active: up == 'x'}" ng-click="up='x'">x</button>
 				<button class="axis y" ng-class="{active: up == 'y'}" ng-click="up='y'">y</button>

@@ -6,4 +6,8 @@ angular.module('me.lazerka.orbit', [])
 	 * Also, space box corners become visible.
 	 */
 	.constant('GLOBAL_SCALE', 1000000)
+
+	.controller('OrbitController', function($scope, $window) {
+		$scope.isMacOs = $window.navigator.appVersion.indexOf("Mac") != -1;
+	})
 ;
