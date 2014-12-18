@@ -102,15 +102,11 @@ angular.module('me.lazerka.orbit')
 				}
 
 				function shouldHandle(event) {
-					return event.which == 3
+					return (event.which == 3 || event.which == 1) // 1 for Mac
 						&& event.target.nodeName == 'CANVAS'
 						&& !event.ctrlKey
 						&& !event.metaKey
 						&& !event.shiftKey
-						|| event.which == 1
-						&& !event.ctrlKey
-						&& event.metaKey  // For mac
-						&& !shiftKey.ctrlKey
 						;
 				}
 				function stopDragging(event) {
