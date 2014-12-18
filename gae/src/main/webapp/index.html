@@ -21,7 +21,8 @@
 	<script type="text/javascript" src="pane.js" defer></script>
 	<script type="text/javascript" src="rotatable.js" defer></script>
 	<script type="text/javascript" src="smooth.js" defer></script>
-	<script type="text/javascript" src="zoomable.js" defer></script>
+	<script type="text/javascript" src="dolly.js" defer></script>
+	<script type="text/javascript" src="zoom.js" defer></script>
 	<style type="text/css">
 		.ng-cloak {display: none;}
 	</style>
@@ -40,40 +41,39 @@
 </div>
 
 <div class="stretch ng-cloak">
-	<pane class="pane" zoomable rotatable clickable>
+	<pane class="pane" dolly zoom rotatable clickable>
 		<celestial
 				texture-url="img/kerbin.jpg"
 				equator="600000"
 				mass="5.2915793e22"
 				orbit="0"
-				color="87cefa"
 				></celestial>
 		<celestial
 				texture-url="img/mun.jpg"
 				equator="200000"
-				orbit="1200000"
 				mass="9.7600236e20"
-				color="48d1cc"
+				orbit="1200000"
 				></celestial>
 
 		<div class="info">
 			<div class="stats"></div>
 			<div class="distance">Distance: {{distance | number}}m</div>
-
-			<!--<div class="warp">x{{warp | number}}</div>-->
-		</div>
-
-		<div class="info2">
-			<div class="look_at_memo">Click to select</div>
-			<div class="scroll_memo">Scroll to dolly</div>
-			<div class="rotate_memo">
-				<span ng-hide="{{isMacOs}}">Right</span><span ng-show="{{isMacOs}}">Cmd</span>-drag to rotate
-			</div>
+			<div class="fov">FOV: {{fov | number}}°</div>
 			<div class="rotate_lock">Camera up:
 				<button class="axis x" ng-class="{active: up == 'x'}" ng-click="up='x'">x</button>
 				<button class="axis y" ng-class="{active: up == 'y'}" ng-click="up='y'">y</button>
 				<button class="axis z" ng-class="{active: up == 'z'}" ng-click="up='z'">z</button>
 				<button class="axis free" ng-class="{active: up == ''}" ng-click="up=''">free</button>
+			</div>
+			<!--<div class="warp">x{{warp | number}}</div>-->
+		</div>
+
+		<div class="info2">
+			<div class="look_at_memo">Click to select</div>
+			<div class="dolly_memo">Scroll to dolly</div>
+			<div class="zoom_memo">Shift-Scroll to zoom</div>
+			<div class="rotate_memo">
+				<span ng-hide="{{isMacOs}}">Right</span><span ng-show="{{isMacOs}}">Cmd</span>-drag to rotate
 			</div>
 		</div>
 	</pane>

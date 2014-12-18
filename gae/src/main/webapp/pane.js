@@ -84,6 +84,13 @@ angular.module('me.lazerka.orbit')
 				$scope.lookingAt = new THREE.Vector3(0, 0, 0);
 				// Distance between camera.position and $scope.lookingAt.
 				$scope.distance = 1;
+				$scope.fov = camera.fov;
+
+				$scope.$watch('fov', function(newValue, oldValue) {
+					camera.fov = newValue;
+					camera.updateProjectionMatrix();
+					console.log('fov: ' + newValue);
+				});
 
 				camera.lookAt($scope.lookingAt);
 				camera.position.set(0, 0, $scope.distance);
