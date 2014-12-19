@@ -21,9 +21,11 @@ angular.module('me.lazerka.orbit')
 				'img/space/z.jpg',
 				'img/space/-z.jpg'
 			], null, function(texture) {
-				var material = new THREE.MeshBasicMaterial({envMap: texture});
-				// Dunno why but here must be at least one negative in order to work.
-				var box = new THREE.BoxGeometry(-100000, -100000, -100000);
+				var material = new THREE.MeshBasicMaterial({
+					envMap: texture,
+					side: THREE.BackSide
+				});
+				var box = new THREE.BoxGeometry(100000, 100000, 100000);
 				scene.add(new THREE.Mesh(box, material));
 			});
 		}
