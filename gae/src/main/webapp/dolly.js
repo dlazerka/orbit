@@ -13,10 +13,11 @@ angular.module('me.lazerka.orbit')
 				scope.distance = distances[6];
 
 				scope.$watch('distance', function(distance) {
+					var lookingAt = scope.lookingAt.mesh.position;
 					pane.camera.position
-						.sub(scope.lookingAt)
+						.sub(lookingAt)
 						.setLength(distance / GLOBAL_SCALE)
-						.add(scope.lookingAt)
+						.add(lookingAt)
 					;
 				});
 

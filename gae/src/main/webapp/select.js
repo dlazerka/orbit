@@ -37,21 +37,18 @@ angular.module('me.lazerka.orbit')
 
 					angular.forEach(scope.celestials, function(celestial) {
 						var intersection = raycaster.intersectObject(celestial.mesh);
-						if (intersection.length) {
+						if (intersection.length && scope.lookingAt != celestial) {
 							select(celestial);
 						}
 					});
 
 					function select(celestial) {
+						var oldLookingAt = scope.lookingAt.mesh.position.clone();
 						var newLookingAt = celestial.mesh.position;
-
-						var oldLookingAt = scope.lookingAt.clone();
 						console.log('Looking at ' + newLookingAt.toArray());
+						scope.lookingAt = celestial;
 
 						function moveLookingAt(delta, deltaPrev) {
-							scope.lookingAt
-								.copy(oldLookingAt)
-								.lerp(newLookingAt, delta);
 							camera.position
 								.add(newLookingAt.clone().sub(oldLookingAt).multiplyScalar(delta - deltaPrev));
 						}

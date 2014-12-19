@@ -4,49 +4,52 @@ angular.module('me.lazerka.orbit')
 		return {
 			restrict: 'E',
 			require: '^pane',
-			scope: {
-				textureUrl: '@',
-				equator: '@',
-				orbit: '@',
-				mass: '@'
-			},
+			scope: {}, // Isolate scope.
 			link: function(scope, element, attrs, pane) {
-				var mass = Number(scope.mass);
-				var radius = scope.equator / 2 / Math.PI / GLOBAL_SCALE;
-				var orbit = parseInt(scope.orbit) / GLOBAL_SCALE;
+				scope.textureUrl = attrs.textureUrl;
+				scope.mass = Number(attrs.mass);
+				scope.radius = Number(attrs.equator) / 2 / Math.PI / GLOBAL_SCALE;
+				scope.orbit = Number(attrs.orbit) / GLOBAL_SCALE;
+				scope.orbitalVelocity = Number(attrs.orbitalVelocity) / GLOBAL_SCALE;
+				scope.rotationPeriod = Number(attrs.rotationPeriod);
 
-				var geometry = new THREE.SphereGeometry(radius, 32, 32);
-				var texture = THREE.ImageUtils.loadTexture(scope.textureUrl, null, onTextureLoaded);
+				var geometry = new THREE.SphereGeometry(scope.radius, 32, 32);
+				var texture = THREE.ImageUtils.loadTexture(scope.textureUrl, null, null);
 
 				var material = new THREE.MeshBasicMaterial({
 					map: texture
 					//wireframe: true
 				});
 				var mesh = new THREE.Mesh(geometry, material);
+				mesh.position.copy({x: scope.orbit, y: 0, z: 0});
+				var celestial = {
+					mesh: mesh,
+					textureUrl: scope.textureUrl
+				};
 
-				var position = {x: orbit, y: 0, z: 0};
-				var velocity = {x: 0, y: 0, z: orbit ? -542.5: 0};
-
-				function onTextureLoaded() {
-					mesh.position.copy(position);
-
-					var celestial = {
-						mesh: mesh,
-						velocity: velocity,
-						mass: mass,
-						textureUrl: scope.textureUrl
-					};
-
-					pane.addCelestial(celestial);
-				}
+				pane.addCelestial(celestial);
 
 				var yAxis = new THREE.Vector3(0, 1, 0);
-				//var angle = 1 / 400;
-				var angle = 0;
-				scope.$on('frame', function(event) {
-					mesh.rotateY(angle);
-					if (orbit) {
-						mesh.position.applyAxisAngle(yAxis, angle);
+				var oldPosition = new THREE.Vector3();
+				scope.$on('frame', function(event, time) {
+					var timeS = pane.getWarp() * time / 1000;
+
+					// Rotate texture.
+					var rotationAngle = timeS * 2*Math.PI / scope.rotationPeriod;
+					mesh.setRotationFromAxisAngle(yAxis, rotationAngle);
+
+					// Move on orbit.
+					if (scope.orbitalVelocity) {
+						oldPosition.copy(mesh.position);
+
+						var orbitalAngle = timeS * scope.orbitalVelocity / scope.orbit;
+						mesh.position.set(scope.orbit, 0, 0);
+						mesh.position.applyAxisAngle(yAxis, orbitalAngle);
+
+						if (pane.getLookingAt().mesh === mesh) {
+							pane.camera.position.sub(oldPosition.sub(mesh.position));
+							pane.camera.updateProjectionMatrix();
+						}
 					}
 				});
 			}

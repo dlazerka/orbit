@@ -48,7 +48,7 @@ angular.module('me.lazerka.orbit')
 							}
 						}
 
-						camera.lookAt(scope.lookingAt);
+						camera.lookAt(scope.lookingAt.mesh.position);
 					}
 				});
 
@@ -64,7 +64,9 @@ angular.module('me.lazerka.orbit')
 					var up = new THREE.Vector3();
 					up.copy(camera.up);
 
-					var eye = camera.position.clone().sub(scope.lookingAt);
+					var lookingAt = scope.lookingAt.mesh.position;
+
+					var eye = camera.position.clone().sub(lookingAt);
 
 					var axis = new THREE.Vector3();
 					axis.copy(up).setLength(mouse.x);
@@ -74,9 +76,9 @@ angular.module('me.lazerka.orbit')
 
 					// Apply the changes.
 					camera.position
-						.sub(scope.lookingAt)
+						.sub(lookingAt)
 						.applyAxisAngle(axis, -angle)
-						.add(scope.lookingAt)
+						.add(lookingAt)
 					;
 
 					// If camera.up is not locked by user, then rotate it too.
@@ -85,7 +87,7 @@ angular.module('me.lazerka.orbit')
 					} else {
 						// This detects 'flip' when `eye` vector comes on the other side of `up` vector.
 						// If angle between vec1 and vec2 > 90, then `flip` occurred.
-						var eyeNew = camera.position.clone().sub(scope.lookingAt);
+						var eyeNew = camera.position.clone().sub(lookingAt);
 						var vec1 = camera.up.clone().cross(eye);
 						var vec2 = camera.up.clone().cross(eyeNew);
 						if (vec1.dot(vec2) < 0) { // angle > 90
@@ -98,7 +100,7 @@ angular.module('me.lazerka.orbit')
 					// then it would be pretty much like Blender does. But for that we'd need to clear the `flipped`
 					// state once mouse button is released.
 
-					camera.lookAt(scope.lookingAt);
+					camera.lookAt(lookingAt);
 				}
 
 				function shouldHandle(event) {

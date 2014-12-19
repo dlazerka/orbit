@@ -39,8 +39,6 @@ angular.module('me.lazerka.orbit')
 		return {
 			restrict: 'E',
 			link : function(scope, element, attrs) {
-				//camera.up.set(0, 1, 0);
-
 				renderer.setSize(element.innerWidth(), element.innerHeight());
 				camera.aspect = element.innerWidth() / element.innerHeight();
 				camera.updateProjectionMatrix();
@@ -68,16 +66,15 @@ angular.module('me.lazerka.orbit')
 				}
 			},
 			controller: function($scope) {
-				$scope.warp = 1; // TODO
-				// So that we don't need to calculate based on direction and distance every time.
-				$scope.lookingAt = new THREE.Vector3(0, 0, 0);
+				$scope.warp = 1;
+				// Celestial. So that we don't need to calculate based on direction and distance every time.
+				$scope.lookingAt = null;
 				// Distance between camera.position and $scope.lookingAt.
 				$scope.distance = 1;
 				$scope.fov = camera.fov = 70;
 				$scope.celestials = [];
 				$scope.up = 'y';
 
-				camera.lookAt($scope.lookingAt);
 				camera.position.set(0, 0, $scope.distance);
 
 				this.camera = camera;
@@ -86,7 +83,19 @@ angular.module('me.lazerka.orbit')
 				this.addCelestial = function(celestial) {
 					$scope.celestials.push(celestial);
 					scene.add(celestial.mesh);
-				}
+
+					// Look at celestial at (0, 0, 0).
+					if (celestial.mesh.position.length() == 0) {
+						$scope.lookingAt = celestial;
+						camera.lookAt($scope.lookingAt.mesh.position);
+					}
+				};
+				this.getLookingAt = function() {
+					return $scope.lookingAt;
+				};
+				this.getWarp = function() {
+					return $scope.warp;
+				};
 			}
 		};
 	})
