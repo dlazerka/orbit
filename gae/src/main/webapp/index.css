@@ -32,13 +32,6 @@ celestial, .celestial {
 	position: absolute;
 }
 
-.play, .pause {
-	font-size: 1em;
-	bottom: 10px;
-	position: absolute;
-	left: 49%;
-}
-
 .info,
 .info2 {
 	position: absolute;
@@ -62,15 +55,24 @@ celestial, .celestial {
 	right: 10px;
 }
 
-.rotate_lock .axis {
+.info button {
+	display: inline-block;
+
 	background-color: black;
 	color: white;
 	border: 2px white solid;
 	border-radius: 5px;
-	display: inline-block;
+
+	font-family: monospace;
+	font-size: 1em;
 	font-weight: bold;
+
+	min-width: 23px;
+	height: 23px;
+}
+
+.rotate_lock .axis {
 	padding: 2px 5px;
-	user-select: none;
 }
 
 .rotate_lock .axis.active {
@@ -80,6 +82,31 @@ celestial, .celestial {
 
 .rotate_lock button {
 	cursor: pointer;
+}
+
+.warp_controls button {
+	background-repeat: no-repeat;
+}
+
+.warp_controls button.active {
+	background-color: white;
+}
+
+svg.arrow {
+	width: 10px;
+	height: 10px;
+}
+
+/*.warp_controls .pause {*/
+	/*background-size: 10px;*/
+	/*background-position: 5px 5px;*/
+	/*background-image: url(img/pause.svg);*/
+/*}*/
+
+.warp_controls .play {
+	background-size: 8px;
+	background-position: 7px 3.5px;
+	background-image: url(img/arrow.svg);
 }
 
 .check-webgl > div {

@@ -69,7 +69,15 @@
 				<button class="axis z" ng-class="{active: up == 'z'}" ng-click="up='z'">z</button>
 				<button class="axis free" ng-class="{active: up == ''}" ng-click="up=''">free</button>
 			</div>
-			<!--<div class="warp">x{{warp | number}}</div>-->
+			<div class="warp_controls">
+				<button class="pause" ng-class="{active: warp == 0}" ng-click="warp=0">
+					<arrow active="{warp == 0}"></arrow>
+				</button>
+				<button class="play x1" ng-class="{active: warp >= 1}" ng-click="warp=1"></button>
+				<button class="play x2" ng-class="{active: warp >= 2}" ng-click="warp=2"></button>
+
+			</div>
+			<div class="warp">x{{warp | number}}</div>
 		</div>
 
 		<div class="info2">

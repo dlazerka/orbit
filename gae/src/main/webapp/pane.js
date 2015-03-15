@@ -62,7 +62,7 @@ angular.module('me.lazerka.orbit')
 					renderer.render(scene, camera);
 
 					stats.end();
-					$window.requestAnimationFrame(renderLoop);
+					//$window.requestAnimationFrame(renderLoop);
 				}
 			},
 			controller: function($scope) {

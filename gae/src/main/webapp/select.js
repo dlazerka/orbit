@@ -45,7 +45,7 @@ angular.module('me.lazerka.orbit')
 					function select(celestial) {
 						var oldLookingAt = scope.lookingAt.mesh.position.clone();
 						var newLookingAt = celestial.mesh.position;
-						console.log('Looking at ' + newLookingAt.toArray());
+						console.log('Looking at ' + celestial.textureUrl);
 						scope.lookingAt = celestial;
 
 						function moveLookingAt(delta, deltaPrev) {
