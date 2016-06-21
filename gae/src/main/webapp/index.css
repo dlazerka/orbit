@@ -45,6 +45,10 @@ celestial, .celestial {
 	left: 10px;
 }
 
+.info > div {
+	padding: 5px 0;
+}
+
 .info .stats {
 	display: none;
 }
@@ -92,21 +96,14 @@ celestial, .celestial {
 	background-color: white;
 }
 
-svg.arrow {
+.warp_controls svg.pause {
 	width: 10px;
 	height: 10px;
 }
 
-/*.warp_controls .pause {*/
-	/*background-size: 10px;*/
-	/*background-position: 5px 5px;*/
-	/*background-image: url(img/pause.svg);*/
-/*}*/
-
-.warp_controls .play {
-	background-size: 8px;
-	background-position: 7px 3.5px;
-	background-image: url(img/arrow.svg);
+.warp_controls svg.play {
+	width: 11px;
+	height: 11px;
 }
 
 .check-webgl > div {

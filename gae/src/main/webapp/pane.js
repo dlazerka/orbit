@@ -55,14 +55,22 @@ angular.module('me.lazerka.orbit')
 
 				renderLoop(0);
 
+				var oldTime = 0;
+				var dt;
 				function renderLoop(time) {
 					stats.begin();
 
-					scope.$broadcast('frame', time);
+					dt = time - oldTime;
+					oldTime = time;
+
+					for (var i = 0; i < scope.celestials.length; i++) {
+						scope.celestials[i].onFrame(time, dt);
+					}
+					//scope.$broadcast('frame', time, dt);
 					renderer.render(scene, camera);
 
 					stats.end();
-					//$window.requestAnimationFrame(renderLoop);
+					$window.requestAnimationFrame(renderLoop);
 				}
 			},
 			controller: function($scope) {

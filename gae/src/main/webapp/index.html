@@ -23,6 +23,7 @@
 	<script type="text/javascript" src="smooth.js" defer></script>
 	<script type="text/javascript" src="dolly.js" defer></script>
 	<script type="text/javascript" src="zoom.js" defer></script>
+	<script type="text/javascript" src="warpControls.js" defer></script>
 	<style type="text/css">
 		.ng-cloak {display: none;}
 	</style>
@@ -54,7 +55,7 @@
 				texture-url="img/mun.jpg"
 				equator="200000"
 				mass="9.7600236e20"
-				orbit="1200000"
+				orbit="12000000"
 				orbital-velocity="542.5"
 				rotation-period="138984.38"
 				></celestial>
@@ -70,14 +71,17 @@
 				<button class="axis free" ng-class="{active: up == ''}" ng-click="up=''">free</button>
 			</div>
 			<div class="warp_controls">
-				<button class="pause" ng-class="{active: warp == 0}" ng-click="warp=0">
-					<arrow active="{warp == 0}"></arrow>
-				</button>
-				<button class="play x1" ng-class="{active: warp >= 1}" ng-click="warp=1"></button>
-				<button class="play x2" ng-class="{active: warp >= 2}" ng-click="warp=2"></button>
-
+				<button warp-pause class="pause" ng-click="warp=0" active="{{warp == 0}}"></button>
+				<button warp-play class="play" ng-click="warp=1" active="{{warp >= 1}}"></button>
+				<button warp-play class="play" ng-click="warp=5" active="{{warp >= 5}}"></button>
+				<button warp-play class="play" ng-click="warp=10" active="{{warp >= 10}}"></button>
+				<button warp-play class="play" ng-click="warp=50" active="{{warp >= 50}}"></button>
+				<button warp-play class="play" ng-click="warp=100" active="{{warp >= 100}}"></button>
+				<button warp-play class="play" ng-click="warp=1000" active="{{warp >= 1000}}"></button>
+				<button warp-play class="play" ng-click="warp=10000" active="{{warp >= 10000}}"></button>
+				<button warp-play class="play" ng-click="warp=100000" active="{{warp >= 100000}}"></button>
+				{{warp | number}}×
 			</div>
-			<div class="warp">x{{warp | number}}</div>
 		</div>
 
 		<div class="info2">

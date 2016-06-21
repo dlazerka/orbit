@@ -22,28 +22,22 @@ angular.module('me.lazerka.orbit')
 				});
 				var mesh = new THREE.Mesh(geometry, material);
 				mesh.position.copy({x: scope.orbit, y: 0, z: 0});
-				var celestial = {
-					mesh: mesh,
-					textureUrl: scope.textureUrl
-				};
-
-				pane.addCelestial(celestial);
 
 				var yAxis = new THREE.Vector3(0, 1, 0);
 				var oldPosition = new THREE.Vector3();
-				scope.$on('frame', function(event, time) {
-					var timeS = pane.getWarp() * time / 1000;
+				var onFrame = function(time, dt) {
+					var dtS = pane.getWarp() * time / 10000;
 
 					// Rotate texture.
-					var rotationAngle = timeS * 2*Math.PI / scope.rotationPeriod;
-					mesh.setRotationFromAxisAngle(yAxis, rotationAngle);
+					var rotationAngle = dtS * 2 * Math.PI / scope.rotationPeriod;
+					mesh.rotateOnAxis(yAxis, rotationAngle);
 
 					// Move on orbit.
 					if (scope.orbitalVelocity) {
 						oldPosition.copy(mesh.position);
 
-						var orbitalAngle = timeS * scope.orbitalVelocity / scope.orbit;
-						mesh.position.set(scope.orbit, 0, 0);
+						var orbitalAngle = dtS * scope.orbitalVelocity / scope.orbit;
+						//mesh.position.set($scope.orbit, 0, 0);
 						mesh.position.applyAxisAngle(yAxis, orbitalAngle);
 
 						if (pane.getLookingAt().mesh === mesh) {
@@ -51,8 +45,16 @@ angular.module('me.lazerka.orbit')
 							pane.camera.updateProjectionMatrix();
 						}
 					}
-				});
+				};
+
+				var celestial = {
+					mesh: mesh,
+					textureUrl: scope.textureUrl,
+					onFrame : onFrame
+				};
+
+				pane.addCelestial(celestial);
 			}
-		};
+		}
 	})
 ;

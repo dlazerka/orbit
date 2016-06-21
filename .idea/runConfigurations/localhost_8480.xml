@@ -4,6 +4,8 @@
     <server-settings>
       <option name="artifact" value="gae-local" />
       <option name="port" value="8480" />
+      <port>8480</port>
+      <artifact>gae-local</artifact>
     </server-settings>
     <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
     <RunnerSettings RunnerId="Debug">
